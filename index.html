@@ -17,27 +17,20 @@
       --accent: #4f9cf7;
       --accent-soft: #1e3a5f;
       --green: #5cb87a;
-      --orange: #d19a66;
-      --purple: #b48ead;
       --red: #e06c75;
       --code-bg: #0b0f14;
-      --code-text: #e5c07b;
       --radius: 16px;
       --radius-sm: 10px;
       --shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
       --transition: 0.2s ease;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       line-height: 1.65;
       padding: 1.2rem 1rem 2rem;
       min-height: 100vh;
@@ -52,7 +45,6 @@
       gap: 1.8rem;
     }
 
-    /* ========== 顶部导航 ========== */
     .site-header {
       display: flex;
       flex-wrap: wrap;
@@ -69,33 +61,29 @@
       display: flex;
       align-items: center;
       gap: 0.7rem;
-      text-decoration: none;
       cursor: pointer;
+      user-select: none;
     }
-    .logo-icon {
-      font-size: 2rem;
-      filter: drop-shadow(0 0 6px rgba(79, 156, 247, 0.5));
-    }
+    .logo-icon { font-size: 2rem; }
     .logo-text {
       font-size: 1.8rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
       color: var(--text);
     }
+    .logo-text span { color: var(--accent); }
     .logo-text em {
       font-style: normal;
       color: var(--accent);
-      font-weight: 400;
-      font-size: 0.7em;
-      margin-left: 6px;
       background: var(--accent-soft);
       padding: 0.2rem 0.6rem;
       border-radius: 40px;
+      font-size: 0.7em;
+      margin-left: 6px;
     }
 
     .nav-links {
       display: flex;
-      gap: 1.8rem;
+      gap: 1.5rem;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -104,48 +92,12 @@
       text-decoration: none;
       font-weight: 500;
       font-size: 0.95rem;
-      transition: color var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 0;
       cursor: pointer;
+      transition: color var(--transition);
     }
-    .nav-links a:hover {
-      color: var(--accent);
-    }
-    .nav-links a.active {
-      color: var(--accent);
-      font-weight: 600;
-      border-bottom: 2px solid var(--accent);
-    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active { color: var(--accent); font-weight: 600; }
 
-    .search-box {
-      display: flex;
-      align-items: center;
-      background: var(--bg);
-      border-radius: 30px;
-      padding: 0.5rem 1.1rem;
-      border: 1px solid var(--border);
-      gap: 0.6rem;
-    }
-    .search-box span {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      width: 150px;
-      font-size: 0.9rem;
-    }
-    .search-box input::placeholder {
-      color: #55657a;
-    }
-
-    /* ========== 按钮 ========== */
     .btn {
       background: var(--accent);
       color: #0d1117;
@@ -157,6 +109,7 @@
       font-size: 0.9rem;
       transition: opacity 0.2s;
       display: inline-block;
+      user-select: none;
     }
     .btn:hover { opacity: 0.85; }
     .btn-secondary {
@@ -172,7 +125,6 @@
     }
     .btn-danger:hover { background: var(--red); color: white; }
 
-    /* ========== 配置面板 ========== */
     .config-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -182,7 +134,7 @@
       display: none;
     }
     .config-panel.active { display: block; }
-    .config-panel h2 { margin-bottom: 1rem; font-size: 1.2rem; color: var(--accent); }
+    .config-panel h2 { margin-bottom: 1rem; color: var(--accent); }
     .config-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .config-row input {
       flex: 1;
@@ -196,7 +148,6 @@
     }
     .config-row input:focus { outline: none; border-color: var(--accent); }
 
-    /* ========== 主内容网格 ========== */
     .main-grid {
       display: grid;
       grid-template-columns: minmax(0, 2.2fr) minmax(270px, 1fr);
@@ -204,7 +155,6 @@
       align-items: start;
     }
 
-    /* ========== 文章列表 ========== */
     .post-list {
       display: flex;
       flex-direction: column;
@@ -216,9 +166,9 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
       padding: 1.8rem 2rem;
+      cursor: pointer;
       transition: all var(--transition);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
     }
     .post-card:hover {
       border-color: #3a4a5e;
@@ -229,111 +179,30 @@
     .post-meta {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
       gap: 0.7rem 1rem;
       margin-bottom: 0.8rem;
-    }
-    .post-date {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
     }
     .badge {
       font-size: 0.72rem;
       font-weight: 600;
       padding: 0.2rem 0.8rem;
       border-radius: 40px;
-      letter-spacing: 0.3px;
       background: #2a3f55;
       color: #7fb3e8;
     }
+    .post-date { font-size: 0.8rem; color: var(--text-secondary); }
+    .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
-    .post-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      line-height: 1.35;
-      margin: 0.3rem 0 0.5rem;
-    }
-    .post-title a {
-      color: var(--text);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .post-title a:hover {
-      color: var(--accent);
-    }
-
-    .post-excerpt {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-
-    .code-snippet {
-      background: var(--code-bg);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.2rem;
-      margin: 1rem 0;
-      font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', Consolas, monospace;
-      font-size: 0.8rem;
-      color: var(--code-text);
-      border-left: 4px solid var(--accent);
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-      margin-top: 0.8rem;
-    }
-    .tag {
-      background: var(--bg);
-      color: var(--text-secondary);
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-      font-size: 0.75rem;
-      border: 1px solid var(--border);
-    }
-
-    /* ========== 侧边栏 ========== */
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
     .sidebar-card {
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 1.5rem 1.6rem;
+      padding: 1.5rem;
       border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    .sidebar-card h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.2rem;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .sidebar-card h3 span {
-      color: var(--accent);
-    }
-
-    .author-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+    .sidebar-card h3 { margin-bottom: 1rem; }
+    .author-box { text-align: center; }
     .avatar {
       width: 72px;
       height: 72px;
@@ -343,49 +212,11 @@
       align-items: center;
       justify-content: center;
       font-size: 2.4rem;
-      margin-bottom: 0.8rem;
-      box-shadow: 0 0 0 3px var(--border);
+      margin: 0 auto 0.8rem;
     }
-    .author-name {
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
-    .author-desc {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      margin: 0.5rem 0 1rem;
-    }
+    .author-name { font-weight: 700; font-size: 1.2rem; }
+    .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    .category-list {
-      list-style: none;
-    }
-    .category-list li {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.7rem 0;
-      border-bottom: 1px dashed var(--border);
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    .category-list li:last-child {
-      border-bottom: none;
-    }
-    .count {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-radius: 30px;
-      padding: 0.1rem 0.7rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .tag-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    /* ========== 文章详情 ========== */
     .post-detail {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -393,30 +224,21 @@
       padding: 2rem;
     }
     .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; }
-    .markdown-body {
-      margin-top: 1.5rem;
-      line-height: 1.8;
-    }
+    .markdown-body { margin-top: 1.5rem; line-height: 1.8; }
     .markdown-body pre {
       background: var(--code-bg);
       padding: 1rem;
       border-radius: 8px;
       overflow-x: auto;
       margin: 1rem 0;
-      font-size: 0.85rem;
     }
     .markdown-body code {
       background: var(--code-bg);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
-      font-size: 0.85rem;
     }
-    .markdown-body pre code {
-      background: none;
-      padding: 0;
-    }
+    .markdown-body pre code { background: none; padding: 0; }
 
-    /* ========== 编辑器 ========== */
     .editor {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -446,38 +268,20 @@
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
       line-height: 1.6;
     }
-    .editor input:focus, .editor textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
+    .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); }
 
-    /* ========== 消息 ========== */
     .hidden { display: none; }
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); }
     .error-msg { background: #2d1518; border: 1px solid var(--red); color: #ffb3b3; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     .success-msg { background: #12261e; border: 1px solid var(--green); color: #7ee2a8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
 
-    /* ========== 响应式 ========== */
     @media (max-width: 900px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-      .site-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
+      .main-grid { grid-template-columns: 1fr; }
+      .site-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
     }
     @media (max-width: 500px) {
-      .post-card {
-        padding: 1.2rem;
-      }
-      .post-title {
-        font-size: 1.4rem;
-      }
-      .search-box input {
-        width: 80px;
-      }
+      .post-card { padding: 1.2rem; }
+      .post-title { font-size: 1.3rem; }
     }
   </style>
 </head>
@@ -502,16 +306,16 @@
       </div>
     </div>
 
-    <!-- 头部导航 -->
+    <!-- 头部 -->
     <header class="site-header">
       <div class="logo-area" id="logoBtn">
         <span class="logo-icon">🌿</span>
         <span class="logo-text">Mirage<span>_Rover</span> <em>OI Blog</em></span>
       </div>
       <nav class="nav-links">
-        <a href="#" id="homeBtn" class="active">🏠 首页</a>
-        <a href="#" id="newPostNavBtn">📝 写文章</a>
-        <a href="#" id="settingsNavBtn">⚙️ 设置</a>
+        <a id="homeBtn" class="active">🏠 首页</a>
+        <a id="newPostNavBtn">📝 写文章</a>
+        <a id="settingsNavBtn">⚙️ 设置</a>
       </nav>
     </header>
 
@@ -520,12 +324,9 @@
 
     <!-- 主内容区 -->
     <div class="main-grid">
-      <!-- 左侧文章列表 -->
       <main class="post-list" id="postList">
         <div class="loading">加载中...</div>
       </main>
-
-      <!-- 右侧边栏 -->
       <aside class="sidebar">
         <div class="sidebar-card">
           <div class="author-box">
@@ -535,10 +336,10 @@
           </div>
         </div>
         <div class="sidebar-card">
-          <h3><span>📂</span> 关于</h3>
+          <h3>📂 关于</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem;">
-            这是一个基于 GitHub Issues 的云端 OI 博客。<br>
-            所有文章存储在您的 GitHub 仓库中。
+            基于 GitHub Issues 的云端 OI 博客。<br>
+            文章存储在您的 GitHub 仓库中。
           </p>
         </div>
       </aside>
@@ -566,24 +367,20 @@
     function showMessage(type, message) {
       const area = document.getElementById('messageArea');
       const cls = type === 'error' ? 'error-msg' : 'success-msg';
-      area.innerHTML = `<div class="${cls}">${escapeHtml(message)}</div>`;
-      setTimeout(() => { area.innerHTML = ''; }, 3000);
+      area.innerHTML = '<div class="' + cls + '">' + escapeHtml(message) + '</div>';
+      setTimeout(function() { area.innerHTML = ''; }, 3000);
     }
 
     function renderMarkdown(text) {
       if (typeof marked !== 'undefined') {
-        marked.setOptions({
-          breaks: true,
-          gfm: true
-        });
+        marked.setOptions({ breaks: true, gfm: true });
         return marked.parse(text);
-      } else {
-        return escapeHtml(text).replace(/\n/g, '<br>');
       }
+      return escapeHtml(text).replace(/\n/g, '<br>');
     }
 
     function isConfigured() {
-      return config.owner && config.repo && config.token;
+      return config.owner !== '' && config.repo !== '' && config.token !== '';
     }
 
     // ==================== 配置管理 ====================
@@ -617,183 +414,136 @@
     }
 
     // ==================== GitHub API ====================
-    async function githubRequest(method, endpoint, body = null) {
+    async function githubRequest(method, endpoint, body) {
       if (!isConfigured()) {
         throw new Error('请先配置 GitHub 信息');
       }
-      const url = `${GITHUB_API}${endpoint}`;
-      const headers = {
-        'Authorization': `token ${config.token}`,
+      var url = GITHUB_API + endpoint;
+      var headers = {
+        'Authorization': 'token ' + config.token,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       };
-      const options = { method, headers };
+      var options = { method: method, headers: headers };
       if (body) options.body = JSON.stringify(body);
       
-      const response = await fetch(url, options);
+      var response = await fetch(url, options);
       if (response.status === 204) return null;
       if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || `GitHub API 错误: ${response.status}`);
+        var errData = await response.json().catch(function() { return {}; });
+        throw new Error(errData.message || 'GitHub API 错误: ' + response.status);
       }
       return response.json();
     }
 
     // ==================== 文章加载 ====================
     async function loadPosts() {
-      const listEl = document.getElementById('postList');
+      var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载中...</div>';
       
       if (!isConfigured()) {
-        listEl.innerHTML = `
-          <div class="loading">
-            <p style="margin-bottom: 1rem;">👋 欢迎使用 OI Blog</p>
-            <p style="font-size: 0.9rem; margin-bottom: 1rem;">请先配置 GitHub 信息以启用云端存储</p>
-            <button class="btn" id="startConfigBtn">⚙️ 开始配置</button>
-          </div>
-        `;
+        listEl.innerHTML = '<div class="loading"><p style="margin-bottom:1rem;">👋 欢迎使用 OI Blog</p><p style="font-size:0.9rem;margin-bottom:1rem;">请先配置 GitHub 信息</p><button class="btn" id="startConfigBtn">⚙️ 开始配置</button></div>';
         document.getElementById('startConfigBtn').addEventListener('click', showConfig);
         return;
       }
       
       try {
-        const cacheBuster = `&_=${Date.now()}`;
-        const issues = await githubRequest('GET', 
-          `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=100${cacheBuster}`
-        );
+        var issues = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
         
-        const validIssues = issues.filter(issue => 
-          issue.state === 'open' && 
-          issue.labels.some(label => label.name === LABEL_PREFIX)
-        );
+        var validIssues = issues.filter(function(issue) {
+          return issue.state === 'open' && issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
+        });
         
         if (validIssues.length === 0) {
-          listEl.innerHTML = '<div class="loading">暂无文章，点击导航栏「📝 写文章」开始记录</div>';
+          listEl.innerHTML = '<div class="loading">暂无文章</div>';
           return;
         }
         
-        listEl.innerHTML = validIssues.map(issue => {
-          const preview = issue.body ? 
-            issue.body.replace(/```[\s\S]*?```/g, '[代码块]').replace(/[#>*`\n]/g, ' ').slice(0, 180) + '...' : '';
-          
-          return `
-            <article class="post-card" data-issue-number="${issue.number}">
-              <div class="post-meta">
-                <span class="badge">#${issue.number}</span>
-                <span class="post-date">📅 ${new Date(issue.created_at).toLocaleDateString('zh-CN')}</span>
-              </div>
-              <h2 class="post-title">${escapeHtml(issue.title)}</h2>
-              <p class="post-excerpt">${escapeHtml(preview)}</p>
-            </article>
-          `;
+        listEl.innerHTML = validIssues.map(function(issue) {
+          var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 180) + '...' : '';
+          return '<article class="post-card" data-issue="' + issue.number + '">' +
+            '<div class="post-meta"><span class="badge">#' + issue.number + '</span>' +
+            '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
+            '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
+            '<p class="post-excerpt">' + escapeHtml(preview) + '</p></article>';
         }).join('');
         
-        // 绑定文章点击事件
-        document.querySelectorAll('.post-card').forEach(card => {
+        document.querySelectorAll('.post-card').forEach(function(card) {
           card.addEventListener('click', function() {
-            const issueNumber = this.getAttribute('data-issue-number');
-            showPost(issueNumber);
+            showPost(this.getAttribute('data-issue'));
           });
         });
       } catch (error) {
-        listEl.innerHTML = `<div class="error-msg">${escapeHtml(error.message)}</div>`;
+        listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
       }
     }
 
     // ==================== 文章详情 ====================
     async function showPost(issueNumber) {
-      const listEl = document.getElementById('postList');
+      var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载文章...</div>';
       
       try {
-        const issue = await githubRequest('GET', 
-          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
-        );
+        var issue = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber);
+        var content = renderMarkdown(issue.body || '');
         
-        const renderedContent = renderMarkdown(issue.body || '');
-        
-        listEl.innerHTML = `
-          <div class="post-detail">
-            <button class="btn btn-secondary" id="backBtn">← 返回列表</button>
-            <h1>${escapeHtml(issue.title)}</h1>
-            <div class="post-meta" style="margin-bottom: 1.5rem;">
-              <span class="badge">#${issue.number}</span>
-              <span class="post-date">📅 创建于 ${new Date(issue.created_at).toLocaleDateString('zh-CN')}</span>
-              ${issue.updated_at !== issue.created_at ? `<span class="post-date">✏️ 更新于 ${new Date(issue.updated_at).toLocaleDateString('zh-CN')}</span>` : ''}
-            </div>
-            <div class="markdown-body">${renderedContent}</div>
-            <div style="margin-top: 2rem; display: flex; gap: 0.8rem;">
-              <button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>
-              <button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button>
-            </div>
-          </div>
-        `;
+        listEl.innerHTML = '<div class="post-detail">' +
+          '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
+          '<h1>' + escapeHtml(issue.title) + '</h1>' +
+          '<div class="post-meta" style="margin-bottom:1.5rem;">' +
+          '<span class="badge">#' + issue.number + '</span>' +
+          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
+          '<div class="markdown-body">' + content + '</div>' +
+          '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
+          '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
+          '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div></div>';
         
         document.getElementById('backBtn').addEventListener('click', loadPosts);
-        document.getElementById('editBtn').addEventListener('click', () => editPost(issueNumber));
-        document.getElementById('deleteBtn').addEventListener('click', () => deletePost(issueNumber, issue.title));
-        
+        document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
+        document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
       } catch (error) {
-        listEl.innerHTML = `<div class="error-msg">${escapeHtml(error.message)}</div>`;
+        listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
       }
     }
 
     // ==================== 编辑器 ====================
-    function showEditor(issueNumber = null, existingData = null) {
-      const listEl = document.getElementById('postList');
-      const isEdit = issueNumber !== null;
+    function showEditor(issueNumber, existingData) {
+      var listEl = document.getElementById('postList');
+      var isEdit = issueNumber !== null && issueNumber !== undefined;
       
-      listEl.innerHTML = `
-        <div class="editor">
-          <h2 style="margin-bottom: 1rem;">${isEdit ? '✏️ 编辑文章 #' + issueNumber : '✏️ 撰写新文章'}</h2>
-          <input type="text" id="editTitle" placeholder="文章标题" value="${existingData ? escapeHtml(existingData.title) : ''}">
-          <textarea id="editContent" placeholder="支持 Markdown 语法&#10;&#10;# 标题&#10;## 子标题&#10;**加粗** *斜体*&#10;&#10;```cpp&#10;代码块&#10;```">${existingData ? escapeHtml(existingData.body) : ''}</textarea>
-          <div style="margin-top: 1rem; display: flex; gap: 0.8rem;">
-            <button class="btn" id="saveBtn">${isEdit ? '💾 保存修改' : '📤 发布'}</button>
-            <button class="btn btn-secondary" id="cancelEditBtn">取消</button>
-          </div>
-        </div>
-      `;
+      var titleValue = existingData ? escapeHtml(existingData.title) : '';
+      var contentValue = existingData ? escapeHtml(existingData.body) : '';
       
-      document.getElementById('saveBtn').addEventListener('click', () => {
-        const title = document.getElementById('editTitle').value.trim();
-        const content = document.getElementById('editContent').value.trim();
-        
-        if (!title || !content) {
-          showMessage('error', '请填写标题和内容');
-          return;
-        }
-        
-        if (isEdit) {
-          updatePost(issueNumber, title, content);
-        } else {
-          publishPost(title, content);
-        }
+      var placeholderText = '支持 Markdown 语法。例如：代码块用三个反引号包裹';
+      
+      listEl.innerHTML = '<div class="editor">' +
+        '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章 #' + issueNumber : '✏️ 撰写新文章') + '</h2>' +
+        '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
+        '<textarea id="editContent" placeholder="' + placeholderText + '">' + contentValue + '</textarea>' +
+        '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
+        '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存修改' : '📤 发布') + '</button>' +
+        '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
+      
+      document.getElementById('saveBtn').addEventListener('click', function() {
+        var title = document.getElementById('editTitle').value.trim();
+        var content = document.getElementById('editContent').value.trim();
+        if (!title || !content) { showMessage('error', '请填写标题和内容'); return; }
+        if (isEdit) { updatePost(issueNumber, title, content); } else { publishPost(title, content); }
       });
       
-      document.getElementById('cancelEditBtn').addEventListener('click', () => {
-        if (isEdit) {
-          showPost(issueNumber);
-        } else {
-          loadPosts();
-        }
+      document.getElementById('cancelEditBtn').addEventListener('click', function() {
+        if (isEdit) { showPost(issueNumber); } else { loadPosts(); }
       });
     }
 
     function showNewPost() {
-      if (!isConfigured()) {
-        showMessage('error', '请先配置 GitHub 信息');
-        showConfig();
-        return;
-      }
-      showEditor();
+      if (!isConfigured()) { showMessage('error', '请先配置 GitHub 信息'); showConfig(); return; }
+      showEditor(null, null);
     }
 
     async function editPost(issueNumber) {
       try {
-        const issue = await githubRequest('GET', 
-          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
-        );
+        var issue = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber);
         showEditor(issueNumber, { title: issue.title, body: issue.body });
       } catch (error) {
         showMessage('error', error.message);
@@ -803,10 +553,7 @@
     // ==================== 发布/更新/删除 ====================
     async function publishPost(title, content) {
       try {
-        await githubRequest('POST', 
-          `/repos/${config.owner}/${config.repo}/issues`,
-          { title, body: content, labels: [LABEL_PREFIX] }
-        );
+        await githubRequest('POST', '/repos/' + config.owner + '/' + config.repo + '/issues', { title: title, body: content, labels: [LABEL_PREFIX] });
         showMessage('success', '文章发布成功！');
         loadPosts();
       } catch (error) {
@@ -816,10 +563,7 @@
 
     async function updatePost(issueNumber, title, content) {
       try {
-        await githubRequest('PATCH', 
-          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`,
-          { title, body: content }
-        );
+        await githubRequest('PATCH', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber, { title: title, body: content });
         showMessage('success', '文章已更新');
         showPost(issueNumber);
       } catch (error) {
@@ -828,29 +572,25 @@
     }
 
     async function deletePost(issueNumber, issueTitle) {
-      if (!confirm(`确定要删除文章「${issueTitle}」吗？\n此操作将永久删除，不可恢复！`)) {
-        return;
-      }
+      if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return;
       
-      const listEl = document.getElementById('postList');
+      var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">正在删除...</div>';
       
       try {
-        const response = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/issues/${issueNumber}`, {
+        var response = await fetch(GITHUB_API + '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber, {
           method: 'DELETE',
           headers: {
-            'Authorization': `token ${config.token}`,
+            'Authorization': 'token ' + config.token,
             'Accept': 'application/vnd.github.v3+json'
           }
         });
         
         if (response.status === 204) {
-          showMessage('success', '文章已永久删除');
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          loadPosts();
+          showMessage('success', '文章已删除');
+          setTimeout(loadPosts, 2000);
         } else {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.message || `删除失败: ${response.status}`);
+          throw new Error('删除失败: ' + response.status);
         }
       } catch (error) {
         showMessage('error', '删除失败: ' + error.message);
@@ -862,24 +602,13 @@
     window.addEventListener('DOMContentLoaded', function() {
       console.log('页面加载完成');
       
-      // 绑定所有按钮
       document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
       document.getElementById('cancelConfigBtn').addEventListener('click', hideConfig);
       document.getElementById('logoBtn').addEventListener('click', loadPosts);
-      document.getElementById('homeBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        loadPosts();
-      });
-      document.getElementById('newPostNavBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        showNewPost();
-      });
-      document.getElementById('settingsNavBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        showConfig();
-      });
+      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); loadPosts(); });
+      document.getElementById('newPostNavBtn').addEventListener('click', function(e) { e.preventDefault(); showNewPost(); });
+      document.getElementById('settingsNavBtn').addEventListener('click', function(e) { e.preventDefault(); showConfig(); });
       
-      // 加载文章列表
       loadPosts();
     });
   </script>
