@@ -322,7 +322,6 @@
     .author-name { font-weight: 700; font-size: 1.2rem; }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    /* 更新日志样式 */
     .changelog {
       max-height: 300px;
       overflow-y: auto;
@@ -381,6 +380,26 @@
       border-radius: 4px;
     }
     .markdown-body pre code { background: none; padding: 0; }
+
+    /* 美化超链接 */
+    .markdown-body a {
+      color: #6cb2f7;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(108, 178, 247, 0.5);
+      padding: 0 2px;
+      transition: all 0.3s ease;
+    }
+    .markdown-body a:hover {
+      color: #8ec5ff;
+      border-bottom: 1px solid #8ec5ff;
+      background: rgba(108, 178, 247, 0.15);
+      border-radius: 4px;
+      padding: 0 4px;
+    }
+    .markdown-body a:active {
+      color: #4f9cf7;
+      background: rgba(108, 178, 247, 0.25);
+    }
 
     .editor {
       background: var(--surface);
@@ -512,7 +531,8 @@
                 📝 支持文章发布/编辑/删除<br>
                 📐 支持 Markdown 渲染<br>
                 🔢 支持 LaTeX 公式<br>
-                🎨 加入动效设计
+                🎨 加入动效设计<br>
+                🔗 美化超链接样式
               </div>
             </div>
           </div>
