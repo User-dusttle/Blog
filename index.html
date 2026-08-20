@@ -4,7 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Mirage_Rover · OI Blog</title>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 使用更稳定的 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+  <!-- MathJax 用于 LaTeX 渲染 -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
   <style>
     /* ========== OI深色主题 ========== */
     :root {
@@ -339,7 +350,7 @@
           <h3>📂 关于</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem;">
             基于 GitHub Issues 的云端 OI 博客。<br>
-            文章存储在您的 GitHub 仓库中。
+            支持 Markdown 和 LaTeX 公式。
           </p>
         </div>
       </aside>
@@ -448,14 +459,15 @@
       }
       
       try {
-        var issues = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
+        var issues = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues?state=all&labels=' + LABEL_PREFIX + '&per_page=100');
         
+        // 只显示 open 状态的文章
         var validIssues = issues.filter(function(issue) {
           return issue.state === 'open' && issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
         });
         
         if (validIssues.length === 0) {
-          listEl.innerHTML = '<div class="loading">暂无文章</div>';
+          listEl.innerHTML = '<div class="loading">暂无文章，点击「📝 写文章」开始记录</div>';
           return;
         }
         
@@ -493,7 +505,7 @@
           '<div class="post-meta" style="margin-bottom:1.5rem;">' +
           '<span class="badge">#' + issue.number + '</span>' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
-          '<div class="markdown-body">' + content + '</div>' +
+          '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
           '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
           '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
           '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div></div>';
@@ -501,6 +513,13 @@
         document.getElementById('backBtn').addEventListener('click', loadPosts);
         document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
         document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
+        
+        // 如果 MathJax 已加载，重新渲染数学公式
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+          MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function(err) {
+            console.log('MathJax 渲染错误:', err);
+          });
+        }
       } catch (error) {
         listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
       }
@@ -514,12 +533,10 @@
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
       
-      var placeholderText = '支持 Markdown 语法。例如：代码块用三个反引号包裹';
-      
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章 #' + issueNumber : '✏️ 撰写新文章') + '</h2>' +
         '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
-        '<textarea id="editContent" placeholder="' + placeholderText + '">' + contentValue + '</textarea>' +
+        '<textarea id="editContent" placeholder="支持 Markdown 和 LaTeX 公式">' + contentValue + '</textarea>' +
         '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
         '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存修改' : '📤 发布') + '</button>' +
         '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
@@ -572,7 +589,7 @@
     }
 
     async function deletePost(issueNumber, issueTitle) {
-      if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return;
+      if (!confirm('确定要删除文章「' + issueTitle + '」吗？\n此操作将永久删除，不可恢复！')) return;
       
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">正在删除...</div>';
@@ -587,13 +604,14 @@
         });
         
         if (response.status === 204) {
-          showMessage('success', '文章已删除');
+          showMessage('success', '文章已永久删除');
           setTimeout(loadPosts, 2000);
         } else {
-          throw new Error('删除失败: ' + response.status);
+          var errData = await response.json().catch(function() { return {}; });
+          throw new Error(errData.message || '删除失败: ' + response.status);
         }
       } catch (error) {
-        showMessage('error', '删除失败: ' + error.message);
+        showMessage('error', '删除失败: ' + error.message + '（如果文章已删除，请刷新页面）');
         loadPosts();
       }
     }
