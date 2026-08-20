@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirage_Rover · OI Blog</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --code-bg: #0b0f14;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      line-height: 1.7;
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    /* 配置面板 */
+    .config-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: none;
+    }
+    .config-panel.show { display: block; }
+    .config-panel h2 { margin-bottom: 1rem; font-size: 1.2rem; color: var(--accent); }
+    .config-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .config-row input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      min-width: 200px;
+    }
+    .config-row input:focus { outline: none; border-color: var(--accent); }
+    .btn {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text-secondary); }
+
+    /* 头部 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo { font-size: 1.6rem; font-weight: 700; }
+    .logo span { color: var(--accent); }
+    .header-actions { display: flex; gap: 0.8rem; align-items: center; }
+
+    /* 文章卡片 */
+    .post-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 1.2rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .post-card:hover { border-color: var(--accent); }
+    .post-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.8rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .post-preview { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* 文章详情 */
+    .post-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+    .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .post-detail .content {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+    .post-detail .content pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+    .post-detail .content code {
+      background: var(--code-bg);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .post-detail .content pre code {
+      background: none;
+      padding: 0;
+    }
+
+    /* 编辑器 */
+    .editor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+    .editor input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .editor textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      min-height: 300px;
+      resize: vertical;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      line-height: 1.6;
+    }
+    .editor input:focus, .editor textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .editor-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+
+    /* 标签 */
+    .tag-input { margin-bottom: 1rem; }
+    .tag-input label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+
+    /* 分页 */
+    .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
+    .pagination button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .pagination button.active { background: var(--accent); color: #0d1117; font-weight: 600; }
+
+    /* 加载状态 */
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    .error-msg {
+      background: #2d1518;
+      border: 1px solid var(--red);
+      color: #ffb3b3;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .success-msg {
+      background: #12261e;
+      border: 1px solid var(--green);
+      color: #7ee2a8;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 配置面板 -->
+    <div class="config-panel" id="configPanel">
+      <h2>⚙️ 博客配置</h2>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+        配置您的 GitHub 仓库信息以启用云端存储。文章将以 Issues 形式存储。
+      </p>
+      <div class="config-row">
+        <input type="text" id="configOwner" placeholder="GitHub 用户名 (如 Mirage_Rover)">
+        <input type="text" id="configRepo" placeholder="仓库名 (如 oi-blog)">
+      </div>
+      <div class="config-row">
+        <input type="password" id="configToken" placeholder="GitHub Token (需要 repo 权限)">
+      </div>
+      <button class="btn" onclick="saveConfig()">💾 保存配置</button>
+      <button class="btn btn-secondary" onclick="hideConfig()" style="margin-left:0.5rem;">取消</button>
+    </div>
+
+    <!-- 头部 -->
+    <header class="header">
+      <div class="logo">🌿 Mirage<span>_Rover</span> · OI Blog</div>
+      <div class="header-actions">
+        <button class="btn" onclick="showNewPost()">✏️ 写文章</button>
+        <button class="btn btn-secondary" onclick="showConfig()">⚙️ 设置</button>
+      </div>
+    </header>
+
+    <!-- 消息区域 -->
+    <div id="messageArea"></div>
+
+    <!-- 文章列表 -->
+    <div id="postList"></div>
+    <div class="pagination" id="pagination"></div>
+
+    <!-- 文章详情 -->
+    <div id="postDetail" class="hidden"></div>
+
+    <!-- 编辑器 -->
+    <div id="editor" class="hidden"></div>
+  </div>
+
+  <script>
+    // ==================== 全局状态 ====================
+    let config = {
+      owner: localStorage.getItem('oi_blog_owner') || '',
+      repo: localStorage.getItem('oi_blog_repo') || '',
+      token: localStorage.getItem('oi_blog_token') || ''
+    };
+    let currentPage = 1;
+    const perPage = 10;
+
+    // ==================== 配置管理 ====================
+    function showConfig() {
+      document.getElementById('configPanel').classList.add('show');
+      document.getElementById('configOwner').value = config.owner;
+      document.getElementById('configRepo').value = config.repo;
+      document.getElementById('configToken').value = config.token;
+    }
+    function hideConfig() {
+      document.getElementById('configPanel').classList.remove('show');
+    }
+    function saveConfig() {
+      config.owner = document.getElementById('configOwner').value.trim();
+      config.repo = document.getElementById('configRepo').value.trim();
+      config.token = document.getElementById('configToken').value.trim();
+      localStorage.setItem('oi_blog_owner', config.owner);
+      localStorage.setItem('oi_blog_repo', config.repo);
+      localStorage.setItem('oi_blog_token', config.token);
+      hideConfig();
+      loadPosts(1);
+    }
+
+    // ==================== API 封装 ====================
+    const GITHUB_API = 'https://api.github.com';
+    const LABEL_PREFIX = 'blog-post'; // 用于标识博客文章的标签
+
+    async function githubRequest(method, endpoint, body = null) {
+      if (!config.owner || !config.repo || !config.token) {
+        throw new Error('请先配置 GitHub 信息');
+      }
+      const url = `${GITHUB_API}${endpoint}`;
+      const headers = {
+        'Authorization': `token ${config.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+      const options = { method, headers };
+      if (body) options.body = JSON.stringify(body);
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || `GitHub API 错误: ${response.status}`);
+      }
+      return response.json();
+    }
+
+    // ==================== 文章操作 ====================
+    async function loadPosts(page = 1) {
+      currentPage = page;
+      const listEl = document.getElementById('postList');
+      const paginationEl = document.getElementById('pagination');
+      listEl.innerHTML = '<div class="loading">加载中...</div>';
+      paginationEl.innerHTML = '';
+      document.getElementById('postDetail').classList.add('hidden');
+      document.getElementById('editor').classList.add('hidden');
+
+      try {
+        const issues = await githubRequest('GET', 
+          `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=${perPage}&page=${page}`
+        );
+        
+        if (issues.length === 0) {
+          listEl.innerHTML = '<div class="loading" style="padding:4rem;">暂无文章，点击「✏️ 写文章」开始记录吧</div>';
+          return;
+        }
+
+        listEl.innerHTML = issues.map(issue => {
+          const labels = issue.labels
+            .filter(l => l.name !== LABEL_PREFIX)
+            .map(l => `<span style="background:#1c2333;color:${l.color ? '#'+l.color : '#58a6ff'};padding:0.2rem 0.6rem;border-radius:20px;font-size:0.7rem;margin-right:0.4rem;">${l.name}</span>`)
+            .join('');
+          
+          const preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码块]').replace(/[#>*`]/g, '').slice(0, 200) + '...' : '';
+          
+          return `
+            <div class="post-card" onclick="showPost(${issue.number})">
+              <div class="post-title">${escapeHtml(issue.title)}</div>
+              <div class="post-meta">
+                <span>#${issue.number}</span>
+                <span>📅 ${new Date(issue.created_at).toLocaleDateString('zh-CN')}</span>
+                <span>💬 ${issue.comments} 条评论</span>
+              </div>
+              <div style="margin-bottom:0.5rem;">${labels}</div>
+              <div class="post-preview">${escapeHtml(preview)}</div>
+            </div>
+          `;
+        }).join('');
+
+        // 分页
+        const totalCount = await getTotalCount();
+        const totalPages = Math.ceil(totalCount / perPage);
+        if (totalPages > 1) {
+          let paginationHTML = '';
+          for (let i = 1; i <= totalPages; i++) {
+            paginationHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadPosts(${i})">${i}</button>`;
+          }
+          paginationEl.innerHTML = paginationHTML;
+        }
+      } catch (error) {
+        listEl.innerHTML = `<div class="error-msg">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function getTotalCount() {
+      try {
+        const issues = await githubRequest('GET', 
+          `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=1`
+        );
+        // 获取总数需要看响应头，这里简化处理，返回一个较大数字
+        return 100; // 简化处理，实际可通过 Link header 解析
+      } catch {
+        return 0;
+      }
+    }
+
+    async function showPost(issueNumber) {
+      const detailEl = document.getElementById('postDetail');
+      detailEl.innerHTML = '<div class="loading">加载文章...</div>';
+      detailEl.classList.remove('hidden');
+      document.getElementById('editor').classList.add('hidden');
+      document.getElementById('postList').innerHTML = '';
+      document.getElementById('pagination').innerHTML = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      try {
+        const issue = await githubRequest('GET', 
+          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
+        );
+        
+        // 解析文章内容，支持简单标记
+        const content = parseMarkdown(issue.body || '');
+        
+        detailEl.innerHTML = `
+          <div class="post-detail">
+            <button class="btn btn-secondary" onclick="loadPosts(${currentPage})" style="margin-bottom:1rem;">← 返回列表</button>
+            <h1>${escapeHtml(issue.title)}</h1>
+            <div class="post-meta">
+              <span>#${issue.number}</span>
+              <span>📅 ${new Date(issue.created_at).toLocaleDateString('zh-CN')}</span>
+              ${issue.updated_at !== issue.created_at ? `<span>✏️ ${new Date(issue.updated_at).toLocaleDateString('zh-CN')}</span>` : ''}
+            </div>
+            <div class="content">${content}</div>
+            <div style="margin-top:2rem; display:flex; gap:0.8rem;">
+              <button class="btn btn-secondary" onclick="editPost(${issue.number})">✏️ 编辑</button>
+              <button class="btn btn-secondary" style="border-color:var(--red);color:var(--red);" onclick="deletePost(${issue.number})">🗑️ 删除</button>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        detailEl.innerHTML = `<div class="error-msg">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function showNewPost() {
+      document.getElementById('postDetail').classList.add('hidden');
+      document.getElementById('postList').innerHTML = '';
+      document.getElementById('pagination').innerHTML = '';
+      const editorEl = document.getElementById('editor');
+      editorEl.innerHTML = `
+        <div class="editor">
+          <h2 style="margin-bottom:1rem;">✏️ 撰写新文章</h2>
+          <input type="text" id="editTitle" placeholder="文章标题">
+          <div class="tag-input">
+            <label>标签（用逗号分隔，如: DP,图论,最短路）</label>
+            <input type="text" id="editTags" placeholder="DP,图论,最短路">
+          </div>
+          <textarea id="editContent" placeholder="支持 Markdown 语法&#10;&#10;# 一级标题&#10;## 二级标题&#10;**加粗** *斜体*&#10;&#10;```cpp&#10;代码块&#10;```"></textarea>
+          <div class="editor-actions">
+            <button class="btn" onclick="publishPost()">📤 发布</button>
+            <button class="btn btn-secondary" onclick="loadPosts(${currentPage})">取消</button>
+          </div>
+        </div>
+      `;
+      editorEl.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function editPost(issueNumber) {
+      const detailEl = document.getElementById('postDetail');
+      detailEl.innerHTML = '<div class="loading">加载编辑器...</div>';
+      
+      try {
+        const issue = await githubRequest('GET', 
+          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
+        );
+        
+        const tags = issue.labels
+          .filter(l => l.name !== LABEL_PREFIX)
+          .map(l => l.name)
+          .join(',');
+        
+        document.getElementById('postList').innerHTML = '';
+        document.getElementById('pagination').innerHTML = '';
+        detailEl.classList.add('hidden');
+        
+        const editorEl = document.getElementById('editor');
+        editorEl.innerHTML = `
+          <div class="editor">
+            <h2 style="margin-bottom:1rem;">✏️ 编辑文章 #${issueNumber}</h2>
+            <input type="text" id="editTitle" value="${escapeHtml(issue.title)}">
+            <div class="tag-input">
+              <label>标签（用逗号分隔）</label>
+              <input type="text" id="editTags" value="${escapeHtml(tags)}">
+            </div>
+            <textarea id="editContent">${escapeHtml(issue.body || '')}</textarea>
+            <div class="editor-actions">
+              <button class="btn" onclick="updatePost(${issueNumber})">💾 保存修改</button>
+              <button class="btn btn-secondary" onclick="showPost(${issueNumber})">取消</button>
+            </div>
+          </div>
+        `;
+        editorEl.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        showMessage('error', error.message);
+      }
+    }
+
+    async function publishPost() {
+      const title = document.getElementById('editTitle').value.trim();
+      const content = document.getElementById('editContent').value.trim();
+      const tags = document.getElementById('editTags').value.trim();
+      
+      if (!title) { showMessage('error', '请输入标题'); return; }
+      if (!content) { showMessage('error', '请输入内容'); return; }
+      
+      const labels = [LABEL_PREFIX];
+      if (tags) {
+        tags.split(',').forEach(t => {
+          const trimmed = t.trim();
+          if (trimmed) labels.push(trimmed);
+        });
+      }
+      
+      try {
+        await githubRequest('POST', 
+          `/repos/${config.owner}/${config.repo}/issues`,
+          { title, body: content, labels }
+        );
+        showMessage('success', '文章发布成功！');
+        document.getElementById('editor').classList.add('hidden');
+        loadPosts(1);
+      } catch (error) {
+        showMessage('error', '发布失败: ' + error.message);
+      }
+    }
+
+    async function updatePost(issueNumber) {
+      const title = document.getElementById('editTitle').value.trim();
+      const content = document.getElementById('editContent').value.trim();
+      const tags = document.getElementById('editTags').value.trim();
+      
+      if (!title) { showMessage('error', '请输入标题'); return; }
+      
+      const labels = [LABEL_PREFIX];
+      if (tags) {
+        tags.split(',').forEach(t => {
+          const trimmed = t.trim();
+          if (trimmed) labels.push(trimmed);
+        });
+      }
+      
+      try {
+        await githubRequest('PATCH', 
+          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`,
+          { title, body: content, labels }
+        );
+        showMessage('success', '文章更新成功！');
+        document.getElementById('editor').classList.add('hidden');
+        showPost(issueNumber);
+      } catch (error) {
+        showMessage('error', '更新失败: ' + error.message);
+      }
+    }
+
+    async function deletePost(issueNumber) {
+      if (!confirm('确定要删除这篇文章吗？此操作不可撤销。')) return;
+      
+      try {
+        await githubRequest('PATCH', 
+          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`,
+          { state: 'closed' }
+        );
+        showMessage('success', '文章已删除');
+        loadPosts(currentPage);
+      } catch (error) {
+        showMessage('error', '删除失败: ' + error.message);
+      }
+    }
+
+    // ==================== 工具函数 ====================
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function parseMarkdown(md) {
+      if (!md) return '';
+      let html = md;
+      
+      // 代码块
+      html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre><code>${escapeHtml(code)}</code></pre>`;
+      });
+      
+      // 行内代码
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      
+      // 标题
+      html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+      html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+      html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+      
+      // 粗体和斜体
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      // 链接
+      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color:var(--accent);">$1</a>');
+      
+      // 换行
+      html = html.replace(/\n/g, '<br>');
+      
+      return html;
+    }
+
+    function showMessage(type, message) {
+      const area = document.getElementById('messageArea');
+      const cls = type === 'error' ? 'error-msg' : 'success-msg';
+      area.innerHTML = `<div class="${cls}">${escapeHtml(message)}</div>`;
+      setTimeout(() => { area.innerHTML = ''; }, 4000);
+    }
+
+    // ==================== 初始化 ====================
+    window.onload = function() {
+      if (config.owner && config.repo && config.token) {
+        loadPosts(1);
+      } else {
+        document.getElementById('postList').innerHTML = `
+          <div class="loading" style="padding:4rem;">
+            <p style="margin-bottom:1rem;">👋 欢迎使用 OI Blog</p>
+            <p style="font-size:0.9rem;">请先配置 GitHub 仓库信息以启用云端存储</p>
+            <button class="btn" onclick="showConfig()" style="margin-top:1rem;">⚙️ 开始配置</button>
+          </div>
+        `;
+      }
+    };
+  </script>
+</body>
+</html>
