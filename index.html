@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mirage_Rover · OI Blog</title>
+  <!-- 引入 marked.js 用于 Markdown 渲染 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
       --bg: #0d1117;
@@ -71,6 +73,12 @@
       border: 1px solid var(--border);
     }
     .btn-secondary:hover { border-color: var(--text-secondary); }
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+    .btn-danger:hover { background: var(--red); color: white; }
 
     /* 头部 */
     .header {
@@ -99,6 +107,71 @@
     .post-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
     .post-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
     .post-preview { color: var(--text-secondary); font-size: 0.9rem; }
+
+    /* 文章详情 */
+    .post-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .post-detail .markdown-body {
+      margin-top: 1.5rem;
+      line-height: 1.8;
+    }
+    .post-detail .markdown-body pre {
+      background: #0b0f14;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .post-detail .markdown-body code {
+      background: #0b0f14;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .post-detail .markdown-body pre code {
+      background: none;
+      padding: 0;
+    }
+
+    /* 编辑器 */
+    .editor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .editor input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .editor textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      min-height: 300px;
+      resize: vertical;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      line-height: 1.6;
+    }
+    .editor input:focus, .editor textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
 
     .hidden { display: none; }
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); }
@@ -150,8 +223,6 @@
       repo: localStorage.getItem('oi_blog_repo') || '',
       token: localStorage.getItem('oi_blog_token') || ''
     };
-    let currentPage = 1;
-    const perPage = 10;
     const GITHUB_API = 'https://api.github.com';
     const LABEL_PREFIX = 'blog-post';
 
@@ -170,9 +241,25 @@
       setTimeout(() => { area.innerHTML = ''; }, 3000);
     }
 
+    function renderMarkdown(text) {
+      if (typeof marked !== 'undefined') {
+        // 使用 marked 渲染 Markdown
+        marked.setOptions({
+          breaks: true,
+          gfm: true,
+          highlight: function(code, lang) {
+            return code;
+          }
+        });
+        return marked.parse(text);
+      } else {
+        // 降级方案：简单转义
+        return escapeHtml(text).replace(/\n/g, '<br>');
+      }
+    }
+
     // ==================== 配置管理 ====================
     function showConfig() {
-      console.log('打开配置面板');
       document.getElementById('configPanel').classList.add('active');
       document.getElementById('configOwner').value = config.owner;
       document.getElementById('configRepo').value = config.repo;
@@ -184,7 +271,6 @@
     }
 
     function saveConfig() {
-      console.log('保存配置');
       config.owner = document.getElementById('configOwner').value.trim();
       config.repo = document.getElementById('configRepo').value.trim();
       config.token = document.getElementById('configToken').value.trim();
@@ -231,7 +317,7 @@
       
       try {
         const issues = await githubRequest('GET', 
-          `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=${perPage}`
+          `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=100`
         );
         
         if (issues.length === 0) {
@@ -241,7 +327,7 @@
         
         contentArea.innerHTML = issues.map(issue => {
           const preview = issue.body ? 
-            issue.body.replace(/```[\s\S]*?```/g, '[代码块]').replace(/[#>*`]/g, '').slice(0, 150) + '...' : '';
+            issue.body.replace(/```[\s\S]*?```/g, '[代码块]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
           
           return `
             <div class="post-card" data-issue-number="${issue.number}">
@@ -275,24 +361,27 @@
           `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
         );
         
+        const renderedContent = renderMarkdown(issue.body || '');
+        
         contentArea.innerHTML = `
-          <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;">
+          <div class="post-detail">
             <button class="btn btn-secondary" id="backBtn">← 返回</button>
-            <h1 style="margin: 1rem 0; font-size: 1.5rem;">${escapeHtml(issue.title)}</h1>
+            <h1>${escapeHtml(issue.title)}</h1>
             <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
-              #${issue.number} | ${new Date(issue.created_at).toLocaleDateString('zh-CN')}
+              #${issue.number} | 创建于 ${new Date(issue.created_at).toLocaleDateString('zh-CN')}
+              ${issue.updated_at !== issue.created_at ? ` | 更新于 ${new Date(issue.updated_at).toLocaleDateString('zh-CN')}` : ''}
             </div>
-            <div style="line-height: 1.8; white-space: pre-wrap;">${escapeHtml(issue.body || '')}</div>
+            <div class="markdown-body">${renderedContent}</div>
             <div style="margin-top: 2rem; display: flex; gap: 0.8rem;">
               <button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>
-              <button class="btn btn-secondary" id="deleteBtn" style="color: var(--red); border-color: var(--red);">🗑️ 删除</button>
+              <button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button>
             </div>
           </div>
         `;
         
         document.getElementById('backBtn').addEventListener('click', loadPosts);
         document.getElementById('editBtn').addEventListener('click', () => editPost(issueNumber));
-        document.getElementById('deleteBtn').addEventListener('click', () => deletePost(issueNumber));
+        document.getElementById('deleteBtn').addEventListener('click', () => deletePost(issueNumber, issue.title));
         
       } catch (error) {
         contentArea.innerHTML = `<div class="error-msg">${escapeHtml(error.message)}</div>`;
@@ -304,10 +393,10 @@
       const isEdit = issueNumber !== null;
       
       contentArea.innerHTML = `
-        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;">
-          <h2 style="margin-bottom: 1rem;">${isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章'}</h2>
-          <input type="text" id="editTitle" placeholder="文章标题" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-size: 1rem;" value="${existingData ? escapeHtml(existingData.title) : ''}">
-          <textarea id="editContent" placeholder="文章内容（支持 Markdown）" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.8rem; border-radius: 8px; min-height: 300px; font-size: 0.95rem; resize: vertical;">${existingData ? escapeHtml(existingData.body) : ''}</textarea>
+        <div class="editor">
+          <h2 style="margin-bottom: 1rem;">${isEdit ? '✏️ 编辑文章 #' + issueNumber : '✏️ 撰写新文章'}</h2>
+          <input type="text" id="editTitle" placeholder="文章标题" value="${existingData ? escapeHtml(existingData.title) : ''}">
+          <textarea id="editContent" placeholder="支持 Markdown 语法&#10;&#10;# 标题&#10;## 子标题&#10;**加粗** *斜体*&#10;&#10;```cpp&#10;代码块&#10;```">${existingData ? escapeHtml(existingData.body) : ''}</textarea>
           <div style="margin-top: 1rem; display: flex; gap: 0.8rem;">
             <button class="btn" id="saveBtn">${isEdit ? '💾 保存修改' : '📤 发布'}</button>
             <button class="btn btn-secondary" id="cancelEditBtn">取消</button>
@@ -386,16 +475,28 @@
       }
     }
 
-    async function deletePost(issueNumber) {
-      if (!confirm('确定要删除这篇文章吗？')) return;
+    async function deletePost(issueNumber, issueTitle) {
+      if (!confirm(`确定要删除文章「${issueTitle}」吗？\n此操作将永久删除，不可恢复！`)) {
+        return;
+      }
       
       try {
-        await githubRequest('PATCH', 
-          `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`,
-          { state: 'closed' }
-        );
-        showMessage('success', '文章已删除');
-        loadPosts();
+        // 使用 DELETE 端点彻底删除 issue
+        const response = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/issues/${issueNumber}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `token ${config.token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        
+        if (response.status === 204) {
+          showMessage('success', '文章已永久删除');
+          loadPosts();
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || `删除失败: ${response.status}`);
+        }
       } catch (error) {
         showMessage('error', '删除失败: ' + error.message);
       }
@@ -404,7 +505,6 @@
     // ==================== 初始化 ====================
     window.addEventListener('DOMContentLoaded', function() {
       console.log('页面加载完成');
-      console.log('当前配置:', config);
       
       // 绑定设置按钮
       document.getElementById('settingsBtn').addEventListener('click', function() {
