@@ -49,7 +49,6 @@
       gap: 1.8rem;
       animation: fadeInUp 0.6s ease;
     }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -57,10 +56,6 @@
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
-    }
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(30px); }
-      to { opacity: 1; transform: translateX(0); }
     }
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
@@ -82,32 +77,12 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease;
-      backdrop-filter: blur(10px);
     }
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.3s ease;
-    }
-    .logo-area:hover {
-      transform: scale(1.03);
-    }
-    .logo-icon { 
-      font-size: 2rem; 
-      animation: bounce 3s ease-in-out infinite;
-    }
+    .logo-area { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; user-select: none; transition: transform 0.3s ease; }
+    .logo-area:hover { transform: scale(1.03); }
+    .logo-icon { font-size: 2rem; animation: bounce 3s ease-in-out infinite; }
     .logo-text { font-size: 1.8rem; font-weight: 700; color: var(--text); }
-    .logo-text span { 
-      color: var(--accent);
-      display: inline-block;
-      transition: transform 0.3s ease;
-    }
-    .logo-text:hover span {
-      transform: rotate(-5deg);
-    }
+    .logo-text span { color: var(--accent); }
     .logo-text em {
       font-style: normal;
       color: var(--accent);
@@ -116,11 +91,6 @@
       border-radius: 40px;
       font-size: 0.7em;
       margin-left: 6px;
-      transition: all 0.3s ease;
-    }
-    .logo-text em:hover {
-      background: var(--accent);
-      color: #0d1117;
     }
     .nav-links { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
     .nav-links a {
@@ -161,81 +131,12 @@
       transition: all 0.3s ease;
       display: inline-block;
       user-select: none;
-      position: relative;
-      overflow: hidden;
     }
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-    .btn:hover { 
-      opacity: 0.9; 
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(79, 156, 247, 0.4);
-    }
-    .btn:active {
-      transform: translateY(0);
-    }
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover { 
-      border-color: var(--text-secondary);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    .btn-danger {
-      background: transparent;
-      color: var(--red);
-      border: 1px solid var(--red);
-    }
-    .btn-danger:hover { 
-      background: var(--red); 
-      color: white;
-      box-shadow: 0 4px 12px rgba(224, 108, 117, 0.4);
-    }
-
-    .config-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      display: none;
-      animation: slideInRight 0.4s ease;
-    }
-    .config-panel.active { display: block; }
-    .config-panel h2 { margin-bottom: 1rem; color: var(--accent); }
-    .config-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .config-row input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.7rem 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      min-width: 200px;
-      transition: all 0.3s ease;
-    }
-    .config-row input:focus { 
-      outline: none; 
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1);
-    }
+    .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 156, 247, 0.4); }
+    .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--text-secondary); }
+    .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
+    .btn-danger:hover { background: var(--red); color: white; }
 
     .main-grid {
       display: grid;
@@ -253,38 +154,20 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       animation: fadeInUp 0.5s ease backwards;
-      position: relative;
     }
     .post-card:nth-child(1) { animation-delay: 0.1s; }
     .post-card:nth-child(2) { animation-delay: 0.2s; }
     .post-card:nth-child(3) { animation-delay: 0.3s; }
-    .post-card:nth-child(4) { animation-delay: 0.4s; }
-    .post-card:nth-child(5) { animation-delay: 0.5s; }
     .post-card:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
       transform: translateY(-4px) scale(1.01);
     }
-    .post-card:active {
-      transform: scale(0.98);
-    }
-    .post-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem 1rem;
-      margin-bottom: 0.8rem;
-    }
+    .post-meta { display: flex; gap: 0.7rem; margin-bottom: 0.8rem; }
     .post-date { font-size: 0.8rem; color: var(--text-secondary); }
-    .post-title { 
-      font-size: 1.5rem; 
-      font-weight: 700; 
-      margin-bottom: 0.5rem;
-      transition: color 0.3s ease;
-    }
-    .post-card:hover .post-title {
-      color: var(--accent);
-    }
+    .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
+    .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
     .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -293,14 +176,9 @@
       border-radius: var(--radius);
       padding: 1.5rem;
       border: 1px solid var(--border);
-      animation: fadeInUp 0.5s ease backwards;
       transition: all 0.3s ease;
     }
-    .sidebar-card:hover {
-      border-color: #3a4a5e;
-      box-shadow: var(--shadow);
-      transform: translateY(-2px);
-    }
+    .sidebar-card:hover { border-color: #3a4a5e; box-shadow: var(--shadow); transform: translateY(-2px); }
     .sidebar-card h3 { margin-bottom: 1rem; }
     .author-box { text-align: center; }
     .avatar {
@@ -313,41 +191,16 @@
       justify-content: center;
       font-size: 2.4rem;
       margin: 0 auto 0.8rem;
-      transition: all 0.4s ease;
-    }
-    .avatar:hover {
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 0 20px rgba(79, 156, 247, 0.3);
     }
     .author-name { font-weight: 700; font-size: 1.2rem; }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    .changelog {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .changelog-item {
-      padding: 0.8rem 0;
-      border-bottom: 1px dashed var(--border);
-    }
-    .changelog-item:last-child {
-      border-bottom: none;
-    }
-    .changelog-version {
-      font-weight: 600;
-      color: var(--accent);
-      font-size: 0.9rem;
-      margin-bottom: 0.3rem;
-    }
-    .changelog-date {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
-    .changelog-desc {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-top: 0.2rem;
-    }
+    .changelog { max-height: 300px; overflow-y: auto; }
+    .changelog-item { padding: 0.8rem 0; border-bottom: 1px dashed var(--border); }
+    .changelog-item:last-child { border-bottom: none; }
+    .changelog-version { font-weight: 600; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.3rem; }
+    .changelog-date { font-size: 0.75rem; color: var(--text-secondary); }
+    .changelog-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
 
     .post-detail {
       background: var(--surface);
@@ -357,11 +210,7 @@
       animation: fadeInUp 0.5s ease;
     }
     .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; }
-    .markdown-body { 
-      margin-top: 1.5rem; 
-      line-height: 1.8;
-      animation: fadeIn 0.5s ease;
-    }
+    .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; }
     .markdown-body pre {
       background: var(--code-bg);
       padding: 1rem;
@@ -369,10 +218,6 @@
       overflow-x: auto;
       margin: 1rem 0;
       border-left: 3px solid var(--accent);
-      transition: all 0.3s ease;
-    }
-    .markdown-body pre:hover {
-      box-shadow: 0 0 15px rgba(79, 156, 247, 0.2);
     }
     .markdown-body code {
       background: var(--code-bg);
@@ -380,8 +225,6 @@
       border-radius: 4px;
     }
     .markdown-body pre code { background: none; padding: 0; }
-
-    /* 美化超链接 */
     .markdown-body a {
       color: #6cb2f7;
       text-decoration: none;
@@ -395,10 +238,6 @@
       background: rgba(108, 178, 247, 0.15);
       border-radius: 4px;
       padding: 0 4px;
-    }
-    .markdown-body a:active {
-      color: #4f9cf7;
-      background: rgba(108, 178, 247, 0.25);
     }
 
     .editor {
@@ -417,7 +256,6 @@
       border-radius: 8px;
       font-size: 1rem;
       margin-bottom: 1rem;
-      transition: all 0.3s ease;
     }
     .editor textarea {
       width: 100%;
@@ -431,38 +269,47 @@
       resize: vertical;
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
       line-height: 1.6;
-      transition: all 0.3s ease;
     }
-    .editor input:focus, .editor textarea:focus { 
-      outline: none; 
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1);
-    }
+    .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); }
 
-    .loading { 
-      text-align: center; 
-      padding: 3rem; 
-      color: var(--text-secondary);
-      animation: pulse 2s ease-in-out infinite;
+    .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
+    .error-msg { background: #2d1518; border: 1px solid var(--red); color: #ffb3b3; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .success-msg { background: #12261e; border: 1px solid var(--green); color: #7ee2a8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+
+    .password-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
-    .error-msg { 
-      background: #2d1518; 
-      border: 1px solid var(--red); 
-      color: #ffb3b3; 
-      padding: 1rem; 
-      border-radius: 8px; 
+    .password-modal.active { display: flex; }
+    .password-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeInUp 0.3s ease;
+    }
+    .password-box h2 { margin-bottom: 1rem; }
+    .password-box input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
       margin-bottom: 1rem;
-      animation: fadeIn 0.3s ease;
     }
-    .success-msg { 
-      background: #12261e; 
-      border: 1px solid var(--green); 
-      color: #7ee2a8; 
-      padding: 1rem; 
-      border-radius: 8px; 
-      margin-bottom: 1rem;
-      animation: fadeIn 0.3s ease;
-    }
+    .password-box input:focus { outline: none; border-color: var(--accent); }
 
     @media (max-width: 900px) {
       .main-grid { grid-template-columns: 1fr; }
@@ -476,24 +323,6 @@
 </head>
 <body>
   <div class="blog-container">
-    <div class="config-panel" id="configPanel">
-      <h2>⚙️ 博客配置</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1rem;">配置 GitHub 仓库信息以启用云端存储</p>
-      <div class="config-row">
-        <input type="text" id="configOwner" placeholder="GitHub 用户名 (如 User-dusttle)">
-      </div>
-      <div class="config-row">
-        <input type="text" id="configRepo" placeholder="仓库名 (如 Blog)">
-      </div>
-      <div class="config-row">
-        <input type="password" id="configToken" placeholder="GitHub Token (需要 repo 权限)">
-      </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <button class="btn" id="saveConfigBtn">💾 保存配置</button>
-        <button class="btn btn-secondary" id="cancelConfigBtn">取消</button>
-      </div>
-    </div>
-
     <header class="site-header">
       <div class="logo-area" id="logoBtn">
         <span class="logo-icon">🌿</span>
@@ -501,8 +330,7 @@
       </div>
       <nav class="nav-links">
         <a id="homeBtn" class="active">🏠 首页</a>
-        <a id="newPostNavBtn">📝 写文章</a>
-        <a id="settingsNavBtn">⚙️ 设置</a>
+        <a id="adminBtn">🔐 管理</a>
       </nav>
     </header>
 
@@ -532,7 +360,7 @@
                 📐 支持 Markdown 渲染<br>
                 🔢 支持 LaTeX 公式<br>
                 🎨 加入动效设计<br>
-                🔗 美化超链接样式
+                🔒 Token 安全代理
               </div>
             </div>
           </div>
@@ -541,14 +369,24 @@
     </div>
   </div>
 
+  <div class="password-modal" id="passwordModal">
+    <div class="password-box">
+      <h2>🔐 管理员验证</h2>
+      <input type="password" id="passwordInput" placeholder="管理密码">
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn" id="passwordConfirmBtn">确认</button>
+        <button class="btn btn-secondary" id="passwordCancelBtn">取消</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    let config = {
-      owner: localStorage.getItem('oi_blog_owner') || '',
-      repo: localStorage.getItem('oi_blog_repo') || '',
-      token: localStorage.getItem('oi_blog_token') || ''
-    };
-    const GITHUB_API = 'https://api.github.com';
+    // ==================== 配置 ====================
+    const PROXY_URL = 'https://wavy-donkey-4453.user-dusttle.deno.net';
+    const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
+    
+    let isAdmin = false;
 
     function escapeHtml(text) {
       if (!text) return '';
@@ -561,11 +399,7 @@
       const area = document.getElementById('messageArea');
       const cls = type === 'error' ? 'error-msg' : 'success-msg';
       area.innerHTML = '<div class="' + cls + '">' + escapeHtml(message) + '</div>';
-      setTimeout(function() { 
-        const msg = area.querySelector('.' + cls);
-        if (msg) msg.style.opacity = '0';
-        setTimeout(function() { area.innerHTML = ''; }, 300);
-      }, 3500);
+      setTimeout(function() { area.innerHTML = ''; }, 3000);
     }
 
     function renderMarkdown(text) {
@@ -576,56 +410,20 @@
       return escapeHtml(text).replace(/\n/g, '<br>');
     }
 
-    function isConfigured() {
-      return config.owner !== '' && config.repo !== '' && config.token !== '';
-    }
-
-    function showConfig() {
-      const panel = document.getElementById('configPanel');
-      panel.classList.add('active');
-      document.getElementById('configOwner').value = config.owner;
-      document.getElementById('configRepo').value = config.repo;
-      document.getElementById('configToken').value = config.token;
-    }
-
-    function hideConfig() {
-      const panel = document.getElementById('configPanel');
-      panel.classList.remove('active');
-    }
-
-    function saveConfig() {
-      config.owner = document.getElementById('configOwner').value.trim();
-      config.repo = document.getElementById('configRepo').value.trim();
-      config.token = document.getElementById('configToken').value.trim();
-      if (!config.owner || !config.repo || !config.token) {
-        showMessage('error', '请填写完整信息');
-        return;
-      }
-      localStorage.setItem('oi_blog_owner', config.owner);
-      localStorage.setItem('oi_blog_repo', config.repo);
-      localStorage.setItem('oi_blog_token', config.token);
-      hideConfig();
-      showMessage('success', '配置已保存');
-      loadPosts();
-    }
-
-    async function githubRequest(method, endpoint, body) {
-      if (!isConfigured()) {
-        throw new Error('请先配置 GitHub 信息');
-      }
-      var url = GITHUB_API + endpoint;
+    async function proxyRequest(method, endpoint, body, useAdmin) {
+      var url = PROXY_URL + endpoint;
       var headers = {
-        'Authorization': 'token ' + config.token,
-        'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       };
+      if (useAdmin) {
+        headers['Authorization'] = 'Bearer ' + ADMIN_PASSWORD;
+      }
       var options = { method: method, headers: headers };
       if (body) options.body = JSON.stringify(body);
       var response = await fetch(url, options);
-      if (response.status === 204) return null;
       if (!response.ok) {
         var errData = await response.json().catch(function() { return {}; });
-        throw new Error(errData.message || 'GitHub API 错误: ' + response.status);
+        throw new Error(errData.message || 'API 错误: ' + response.status);
       }
       return response.json();
     }
@@ -633,18 +431,13 @@
     async function loadPosts() {
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载中...</div>';
-      if (!isConfigured()) {
-        listEl.innerHTML = '<div class="loading"><p style="margin-bottom:1rem;">👋 欢迎使用 OI Blog</p><p style="font-size:0.9rem;margin-bottom:1rem;">请先配置 GitHub 信息</p><button class="btn" id="startConfigBtn">⚙️ 开始配置</button></div>';
-        document.getElementById('startConfigBtn').addEventListener('click', showConfig);
-        return;
-      }
       try {
-        var issues = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
+        var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
         var validIssues = issues.filter(function(issue) {
           return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
         });
         if (validIssues.length === 0) {
-          listEl.innerHTML = '<div class="loading">暂无文章，点击「📝 写文章」开始记录</div>';
+          listEl.innerHTML = '<div class="loading">暂无文章</div>';
           return;
         }
         listEl.innerHTML = validIssues.map(function(issue) {
@@ -668,31 +461,57 @@
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载文章...</div>';
       try {
-        var issue = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber);
+        var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         var content = renderMarkdown(issue.body || '');
+        var adminButtons = isAdmin ? 
+          '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
+          '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
+          '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
           '<div class="post-meta" style="margin-bottom:1.5rem;">' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
-          '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
-          '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
-          '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div></div>';
+          adminButtons + '</div>';
         document.getElementById('backBtn').addEventListener('click', loadPosts);
-        document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
-        document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
+        if (isAdmin) {
+          document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
+          document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
+        }
         if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-          MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function(err) {
-            console.log('MathJax 渲染错误:', err);
-          });
+          MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {});
         }
       } catch (error) {
         listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
       }
     }
 
+    function showPasswordModal() {
+      document.getElementById('passwordModal').classList.add('active');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    }
+
+    function hidePasswordModal() {
+      document.getElementById('passwordModal').classList.remove('active');
+    }
+
+    function verifyPassword() {
+      var input = document.getElementById('passwordInput').value;
+      if (input === ADMIN_PASSWORD) {
+        isAdmin = true;
+        hidePasswordModal();
+        showMessage('success', '管理员验证成功');
+        document.getElementById('adminBtn').textContent = '✏️ 写文章';
+        loadPosts();
+      } else {
+        showMessage('error', '密码错误');
+      }
+    }
+
     function showEditor(issueNumber, existingData) {
+      if (!isAdmin) { showPasswordModal(); return; }
       var listEl = document.getElementById('postList');
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
@@ -715,14 +534,9 @@
       });
     }
 
-    function showNewPost() {
-      if (!isConfigured()) { showMessage('error', '请先配置 GitHub 信息'); showConfig(); return; }
-      showEditor(null, null);
-    }
-
     async function editPost(issueNumber) {
       try {
-        var issue = await githubRequest('GET', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber);
+        var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         showEditor(issueNumber, { title: issue.title, body: issue.body });
       } catch (error) {
         showMessage('error', error.message);
@@ -731,7 +545,7 @@
 
     async function publishPost(title, content) {
       try {
-        await githubRequest('POST', '/repos/' + config.owner + '/' + config.repo + '/issues', { title: title, body: content, labels: [LABEL_PREFIX] });
+        await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: [LABEL_PREFIX] }, true);
         showMessage('success', '文章发布成功！');
         loadPosts();
       } catch (error) {
@@ -741,7 +555,7 @@
 
     async function updatePost(issueNumber, title, content) {
       try {
-        await githubRequest('PATCH', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber, { title: title, body: content });
+        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content }, true);
         showMessage('success', '文章已更新');
         showPost(issueNumber);
       } catch (error) {
@@ -754,7 +568,7 @@
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">正在删除...</div>';
       try {
-        await githubRequest('PATCH', '/repos/' + config.owner + '/' + config.repo + '/issues/' + issueNumber, { state: 'closed' });
+        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true);
         showMessage('success', '文章已删除');
         loadPosts();
       } catch (error) {
@@ -764,13 +578,17 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      console.log('页面加载完成');
-      document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
-      document.getElementById('cancelConfigBtn').addEventListener('click', hideConfig);
       document.getElementById('logoBtn').addEventListener('click', loadPosts);
       document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); loadPosts(); });
-      document.getElementById('newPostNavBtn').addEventListener('click', function(e) { e.preventDefault(); showNewPost(); });
-      document.getElementById('settingsNavBtn').addEventListener('click', function(e) { e.preventDefault(); showConfig(); });
+      document.getElementById('adminBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
+      });
+      document.getElementById('passwordConfirmBtn').addEventListener('click', verifyPassword);
+      document.getElementById('passwordCancelBtn').addEventListener('click', hidePasswordModal);
+      document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') verifyPassword();
+      });
       loadPosts();
     });
   </script>
