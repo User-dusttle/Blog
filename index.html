@@ -57,6 +57,10 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
@@ -64,6 +68,10 @@
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
     .site-header {
@@ -77,12 +85,14 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease;
+      backdrop-filter: blur(10px);
     }
     .logo-area { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; user-select: none; transition: transform 0.3s ease; }
     .logo-area:hover { transform: scale(1.03); }
     .logo-icon { font-size: 2rem; animation: bounce 3s ease-in-out infinite; }
     .logo-text { font-size: 1.8rem; font-weight: 700; color: var(--text); }
-    .logo-text span { color: var(--accent); }
+    .logo-text span { color: var(--accent); display: inline-block; transition: transform 0.3s ease; }
+    .logo-text:hover span { transform: rotate(-5deg); }
     .logo-text em {
       font-style: normal;
       color: var(--accent);
@@ -91,7 +101,9 @@
       border-radius: 40px;
       font-size: 0.7em;
       margin-left: 6px;
+      transition: all 0.3s ease;
     }
+    .logo-text em:hover { background: var(--accent); color: #0d1117; }
     .nav-links { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
     .nav-links a {
       color: var(--text-secondary);
@@ -131,12 +143,28 @@
       transition: all 0.3s ease;
       display: inline-block;
       user-select: none;
+      position: relative;
+      overflow: hidden;
     }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .btn:hover::before { width: 300px; height: 300px; }
     .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 156, 247, 0.4); }
+    .btn:active { transform: translateY(0); }
     .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
-    .btn-secondary:hover { border-color: var(--text-secondary); }
+    .btn-secondary:hover { border-color: var(--text-secondary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
     .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
-    .btn-danger:hover { background: var(--red); color: white; }
+    .btn-danger:hover { background: var(--red); color: white; box-shadow: 0 4px 12px rgba(224, 108, 117, 0.4); }
 
     .main-grid {
       display: grid;
@@ -155,17 +183,33 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       animation: fadeInUp 0.5s ease backwards;
     }
-    .post-card:nth-child(1) { animation-delay: 0.1s; }
-    .post-card:nth-child(2) { animation-delay: 0.2s; }
-    .post-card:nth-child(3) { animation-delay: 0.3s; }
+    .post-card:nth-child(1) { animation-delay: 0.05s; }
+    .post-card:nth-child(2) { animation-delay: 0.1s; }
+    .post-card:nth-child(3) { animation-delay: 0.15s; }
+    .post-card:nth-child(4) { animation-delay: 0.2s; }
+    .post-card:nth-child(5) { animation-delay: 0.25s; }
+    .post-card:nth-child(6) { animation-delay: 0.3s; }
+    .post-card:nth-child(7) { animation-delay: 0.35s; }
+    .post-card:nth-child(8) { animation-delay: 0.4s; }
     .post-card:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
       transform: translateY(-4px) scale(1.01);
     }
-    .post-meta { display: flex; gap: 0.7rem; margin-bottom: 0.8rem; }
+    .post-card:active { transform: scale(0.98); }
+    .post-meta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.8rem; }
     .post-date { font-size: 0.8rem; color: var(--text-secondary); }
+    .post-tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .post-tag:hover { background: var(--accent); color: #0d1117; }
     .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
@@ -177,9 +221,12 @@
       padding: 1.5rem;
       border: 1px solid var(--border);
       transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease backwards;
     }
     .sidebar-card:hover { border-color: #3a4a5e; box-shadow: var(--shadow); transform: translateY(-2px); }
-    .sidebar-card h3 { margin-bottom: 1rem; }
+    .sidebar-card h3 { margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none; }
+    .sidebar-card h3 .arrow { transition: transform 0.3s ease; display: inline-block; }
+    .sidebar-card h3 .arrow.collapsed { transform: rotate(-90deg); }
     .author-box { text-align: center; }
     .avatar {
       width: 72px;
@@ -191,16 +238,22 @@
       justify-content: center;
       font-size: 2.4rem;
       margin: 0 auto 0.8rem;
+      transition: all 0.4s ease;
     }
+    .avatar:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 20px rgba(79, 156, 247, 0.3); }
     .author-name { font-weight: 700; font-size: 1.2rem; }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    .changelog { max-height: 300px; overflow-y: auto; }
+    .changelog { max-height: 300px; overflow-y: auto; transition: max-height 0.4s ease; }
+    .changelog.collapsed { max-height: 0; overflow: hidden; }
     .changelog-item { padding: 0.8rem 0; border-bottom: 1px dashed var(--border); }
     .changelog-item:last-child { border-bottom: none; }
     .changelog-version { font-weight: 600; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.3rem; }
     .changelog-date { font-size: 0.75rem; color: var(--text-secondary); }
     .changelog-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-cloud .post-tag { font-size: 0.75rem; }
 
     .post-detail {
       background: var(--surface);
@@ -218,7 +271,9 @@
       overflow-x: auto;
       margin: 1rem 0;
       border-left: 3px solid var(--accent);
+      transition: all 0.3s ease;
     }
+    .markdown-body pre:hover { box-shadow: 0 0 15px rgba(79, 156, 247, 0.2); }
     .markdown-body code {
       background: var(--code-bg);
       padding: 0.2rem 0.5rem;
@@ -240,6 +295,30 @@
       padding: 0 4px;
     }
 
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1);
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.9rem;
+      width: 150px;
+    }
+    .search-box input::placeholder { color: #55657a; }
+
     .editor {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -247,7 +326,7 @@
       padding: 2rem;
       animation: fadeInUp 0.5s ease;
     }
-    .editor input[type="text"] {
+    .editor input[type="text"], .editor input[type="password"] {
       width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
@@ -256,6 +335,7 @@
       border-radius: 8px;
       font-size: 1rem;
       margin-bottom: 1rem;
+      transition: all 0.3s ease;
     }
     .editor textarea {
       width: 100%;
@@ -269,12 +349,29 @@
       resize: vertical;
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
       line-height: 1.6;
+      transition: all 0.3s ease;
     }
-    .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); }
+    .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1); }
+
+    .tag-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+    .tag-input-row input { flex: 1; min-width: 150px; margin-bottom: 0 !important; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .tag-chip .remove-tag { cursor: pointer; font-weight: bold; transition: color 0.2s; }
+    .tag-chip .remove-tag:hover { color: var(--red); }
 
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
-    .error-msg { background: #2d1518; border: 1px solid var(--red); color: #ffb3b3; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-    .success-msg { background: #12261e; border: 1px solid var(--green); color: #7ee2a8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .error-msg { background: #2d1518; border: 1px solid var(--red); color: #ffb3b3; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; animation: fadeIn 0.3s ease; }
+    .success-msg { background: #12261e; border: 1px solid var(--green); color: #7ee2a8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; animation: fadeIn 0.3s ease; }
 
     .password-modal {
       position: fixed;
@@ -318,6 +415,7 @@
     @media (max-width: 500px) {
       .post-card { padding: 1.2rem; }
       .post-title { font-size: 1.3rem; }
+      .search-box input { width: 80px; }
     }
   </style>
 </head>
@@ -332,6 +430,10 @@
         <a id="homeBtn" class="active">🏠 首页</a>
         <a id="adminBtn">🔐 管理</a>
       </nav>
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="搜索文章...">
+      </div>
     </header>
 
     <div id="messageArea"></div>
@@ -349,8 +451,18 @@
           </div>
         </div>
         <div class="sidebar-card">
-          <h3>📋 更新日志</h3>
-          <div class="changelog">
+          <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
+          <div class="changelog" id="changelogContent">
+            <div class="changelog-item">
+              <div class="changelog-version">v1.1.0</div>
+              <div class="changelog-date">2025-08-20</div>
+              <div class="changelog-desc">
+                ✨ 新增搜索功能<br>
+                🏷️ 新增标签筛选<br>
+                📂 更新日志折叠<br>
+                🎨 保持动效设计
+              </div>
+            </div>
             <div class="changelog-item">
               <div class="changelog-version">v1.0.0</div>
               <div class="changelog-date">2025-08-20</div>
@@ -358,11 +470,15 @@
                 ✨ 初始版本发布<br>
                 📝 支持文章发布/编辑/删除<br>
                 📐 支持 Markdown 渲染<br>
-                🔢 支持 LaTeX 公式<br>
-                🎨 加入动效设计<br>
-                🔒 Token 安全代理
+                🔢 支持 LaTeX 公式
               </div>
             </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3>🏷️ 标签筛选</h3>
+          <div class="tag-cloud" id="tagCloud">
+            <span class="loading" style="padding:1rem;">加载标签...</span>
           </div>
         </div>
       </aside>
@@ -381,12 +497,14 @@
   </div>
 
   <script>
-    // ==================== 配置 ====================
     const PROXY_URL = 'https://wavy-donkey-4453.user-dusttle.deno.net';
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
     
     let isAdmin = false;
+    let allPosts = [];
+    let activeTag = null;
+    let searchQuery = '';
 
     function escapeHtml(text) {
       if (!text) return '';
@@ -412,12 +530,8 @@
 
     async function proxyRequest(method, endpoint, body, useAdmin) {
       var url = PROXY_URL + endpoint;
-      var headers = {
-        'Content-Type': 'application/json'
-      };
-      if (useAdmin) {
-        headers['Authorization'] = 'Bearer ' + ADMIN_PASSWORD;
-      }
+      var headers = { 'Content-Type': 'application/json' };
+      if (useAdmin) headers['Authorization'] = 'Bearer ' + ADMIN_PASSWORD;
       var options = { method: method, headers: headers };
       if (body) options.body = JSON.stringify(body);
       var response = await fetch(url, options);
@@ -433,28 +547,95 @@
       listEl.innerHTML = '<div class="loading">加载中...</div>';
       try {
         var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
-        var validIssues = issues.filter(function(issue) {
+        allPosts = issues.filter(function(issue) {
           return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
         });
-        if (validIssues.length === 0) {
-          listEl.innerHTML = '<div class="loading">暂无文章</div>';
-          return;
-        }
-        listEl.innerHTML = validIssues.map(function(issue) {
-          var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 180) + '...' : '';
-          return '<article class="post-card" data-issue="' + issue.number + '">' +
-            '<div class="post-meta"><span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
-            '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
-            '<p class="post-excerpt">' + escapeHtml(preview) + '</p></article>';
-        }).join('');
-        document.querySelectorAll('.post-card').forEach(function(card) {
-          card.addEventListener('click', function() {
-            showPost(this.getAttribute('data-issue'));
-          });
-        });
+        renderPosts();
+        renderTagCloud();
       } catch (error) {
         listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
       }
+    }
+
+    function renderPosts() {
+      var listEl = document.getElementById('postList');
+      var filteredPosts = allPosts;
+      
+      // 标签筛选
+      if (activeTag) {
+        filteredPosts = filteredPosts.filter(function(issue) {
+          return issue.labels.some(function(label) { return label.name === activeTag; });
+        });
+      }
+      
+      // 搜索筛选
+      if (searchQuery) {
+        var query = searchQuery.toLowerCase();
+        filteredPosts = filteredPosts.filter(function(issue) {
+          return issue.title.toLowerCase().includes(query) || 
+                 (issue.body && issue.body.toLowerCase().includes(query));
+        });
+      }
+      
+      if (filteredPosts.length === 0) {
+        listEl.innerHTML = '<div class="loading">暂无匹配文章</div>';
+        return;
+      }
+      
+      listEl.innerHTML = filteredPosts.map(function(issue) {
+        var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
+        var tags = issue.labels
+          .filter(function(l) { return l.name !== LABEL_PREFIX; })
+          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; })
+          .join('');
+        return '<article class="post-card" data-issue="' + issue.number + '">' +
+          '<div class="post-meta"><span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
+          '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
+          '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
+          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
+          '</article>';
+      }).join('');
+      
+      document.querySelectorAll('.post-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.classList.contains('post-tag')) {
+            e.stopPropagation();
+            activeTag = e.target.getAttribute('data-tag');
+            renderPosts();
+          } else {
+            showPost(this.getAttribute('data-issue'));
+          }
+        });
+      });
+    }
+
+    function renderTagCloud() {
+      var tagCloud = document.getElementById('tagCloud');
+      var allTags = {};
+      allPosts.forEach(function(issue) {
+        issue.labels.forEach(function(label) {
+          if (label.name !== LABEL_PREFIX) {
+            if (!allTags[label.name]) allTags[label.name] = 0;
+            allTags[label.name]++;
+          }
+        });
+      });
+      var tagNames = Object.keys(allTags);
+      if (tagNames.length === 0) {
+        tagCloud.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">暂无标签</span>';
+        return;
+      }
+      tagCloud.innerHTML = tagNames.map(function(tag) {
+        return '<span class="post-tag' + (activeTag === tag ? ' active' : '') + '" data-tag="' + tag + '" style="cursor:pointer;">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
+      }).join('');
+      
+      tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+          activeTag = this.getAttribute('data-tag');
+          renderPosts();
+          renderTagCloud();
+        });
+      });
     }
 
     async function showPost(issueNumber) {
@@ -463,6 +644,10 @@
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         var content = renderMarkdown(issue.body || '');
+        var tags = issue.labels
+          .filter(function(l) { return l.name !== LABEL_PREFIX; })
+          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; })
+          .join(' ');
         var adminButtons = isAdmin ? 
           '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
           '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
@@ -470,8 +655,10 @@
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
-          '<div class="post-meta" style="margin-bottom:1.5rem;">' +
-          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
+          '<div class="post-meta" style="margin-bottom:1rem;">' +
+          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
+          (tags ? '<span style="display:flex;gap:0.5rem;flex-wrap:wrap;">' + tags + '</span>' : '') +
+          '</div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
           adminButtons + '</div>';
         document.getElementById('backBtn').addEventListener('click', loadPosts);
@@ -492,11 +679,9 @@
       document.getElementById('passwordInput').value = '';
       document.getElementById('passwordInput').focus();
     }
-
     function hidePasswordModal() {
       document.getElementById('passwordModal').classList.remove('active');
     }
-
     function verifyPassword() {
       var input = document.getElementById('passwordInput').value;
       if (input === ADMIN_PASSWORD) {
@@ -516,19 +701,63 @@
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
+      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX; }).map(function(l) { return l.name; }) : [];
+      
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
         '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
+        '<div class="tag-input-row">' +
+        '<input type="text" id="tagInput" placeholder="添加标签（回车确认）">' +
+        '<button class="btn btn-secondary" id="addTagBtn">添加</button>' +
+        '</div>' +
+        '<div class="tag-list" id="tagList"></div>' +
         '<textarea id="editContent" placeholder="支持 Markdown 和 LaTeX 公式">' + contentValue + '</textarea>' +
         '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
         '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存修改' : '📤 发布') + '</button>' +
         '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
+      
+      var currentTags = existingTags.slice();
+      
+      function renderTags() {
+        var tagList = document.getElementById('tagList');
+        tagList.innerHTML = currentTags.map(function(tag) {
+          return '<span class="tag-chip">' + escapeHtml(tag) + ' <span class="remove-tag" data-tag="' + tag + '">×</span></span>';
+        }).join('');
+        tagList.querySelectorAll('.remove-tag').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var tagToRemove = this.getAttribute('data-tag');
+            currentTags = currentTags.filter(function(t) { return t !== tagToRemove; });
+            renderTags();
+          });
+        });
+      }
+      
+      renderTags();
+      
+      function addTag() {
+        var tagInput = document.getElementById('tagInput');
+        var tag = tagInput.value.trim();
+        if (tag && currentTags.indexOf(tag) === -1) {
+          currentTags.push(tag);
+          renderTags();
+        }
+        tagInput.value = '';
+        tagInput.focus();
+      }
+      
+      document.getElementById('addTagBtn').addEventListener('click', addTag);
+      document.getElementById('tagInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+      });
+      
       document.getElementById('saveBtn').addEventListener('click', function() {
         var title = document.getElementById('editTitle').value.trim();
         var content = document.getElementById('editContent').value.trim();
         if (!title || !content) { showMessage('error', '请填写标题和内容'); return; }
-        if (isEdit) { updatePost(issueNumber, title, content); } else { publishPost(title, content); }
+        var labels = [LABEL_PREFIX].concat(currentTags);
+        if (isEdit) { updatePost(issueNumber, title, content, labels); } else { publishPost(title, content, labels); }
       });
+      
       document.getElementById('cancelEditBtn').addEventListener('click', function() {
         if (isEdit) { showPost(issueNumber); } else { loadPosts(); }
       });
@@ -537,15 +766,15 @@
     async function editPost(issueNumber) {
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
-        showEditor(issueNumber, { title: issue.title, body: issue.body });
+        showEditor(issueNumber, issue);
       } catch (error) {
         showMessage('error', error.message);
       }
     }
 
-    async function publishPost(title, content) {
+    async function publishPost(title, content, labels) {
       try {
-        await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: [LABEL_PREFIX] }, true);
+        await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true);
         showMessage('success', '文章发布成功！');
         loadPosts();
       } catch (error) {
@@ -553,9 +782,9 @@
       }
     }
 
-    async function updatePost(issueNumber, title, content) {
+    async function updatePost(issueNumber, title, content, labels) {
       try {
-        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content }, true);
+        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true);
         showMessage('success', '文章已更新');
         showPost(issueNumber);
       } catch (error) {
@@ -578,8 +807,19 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('logoBtn').addEventListener('click', loadPosts);
-      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); loadPosts(); });
+      document.getElementById('logoBtn').addEventListener('click', function() {
+        activeTag = null;
+        searchQuery = '';
+        document.getElementById('searchInput').value = '';
+        loadPosts();
+      });
+      document.getElementById('homeBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        activeTag = null;
+        searchQuery = '';
+        document.getElementById('searchInput').value = '';
+        loadPosts();
+      });
       document.getElementById('adminBtn').addEventListener('click', function(e) {
         e.preventDefault();
         if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
@@ -589,6 +829,21 @@
       document.getElementById('passwordInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') verifyPassword();
       });
+      
+      // 搜索
+      document.getElementById('searchInput').addEventListener('input', function() {
+        searchQuery = this.value.trim();
+        renderPosts();
+      });
+      
+      // 更新日志折叠
+      document.getElementById('changelogToggle').addEventListener('click', function() {
+        var content = document.getElementById('changelogContent');
+        var arrow = this.querySelector('.arrow');
+        content.classList.toggle('collapsed');
+        arrow.classList.toggle('collapsed');
+      });
+      
       loadPosts();
     });
   </script>
