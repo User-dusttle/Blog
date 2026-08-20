@@ -28,7 +28,6 @@
     }
     .container { max-width: 1000px; margin: 0 auto; }
 
-    /* 配置面板 */
     .config-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -70,7 +69,6 @@
     }
     .btn-secondary:hover { border-color: var(--text-secondary); }
 
-    /* 头部 */
     .header {
       display: flex;
       align-items: center;
@@ -83,7 +81,6 @@
     .logo span { color: var(--accent); }
     .header-actions { display: flex; gap: 0.8rem; align-items: center; }
 
-    /* 文章卡片 */
     .post-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -98,7 +95,6 @@
     .post-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.8rem; display: flex; gap: 1rem; flex-wrap: wrap; }
     .post-preview { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* 文章详情 */
     .post-detail {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -131,7 +127,6 @@
       padding: 0;
     }
 
-    /* 编辑器 */
     .editor {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -168,11 +163,9 @@
     }
     .editor-actions { display: flex; gap: 1rem; margin-top: 1rem; }
 
-    /* 标签 */
     .tag-input { margin-bottom: 1rem; }
     .tag-input label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
 
-    /* 分页 */
     .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
     .pagination button {
       background: var(--surface);
@@ -184,7 +177,6 @@
     }
     .pagination button.active { background: var(--accent); color: #0d1117; font-weight: 600; }
 
-    /* 加载状态 */
     .loading {
       text-align: center;
       padding: 3rem;
@@ -218,8 +210,8 @@
         配置您的 GitHub 仓库信息以启用云端存储。文章将以 Issues 形式存储。
       </p>
       <div class="config-row">
-        <input type="text" id="configOwner" placeholder="GitHub 用户名 (如 Mirage_Rover)">
-        <input type="text" id="configRepo" placeholder="仓库名 (如 oi-blog)">
+        <input type="text" id="configOwner" placeholder="GitHub 用户名 (如 User-dusttle)">
+        <input type="text" id="configRepo" placeholder="仓库名 (如 Blog)">
       </div>
       <div class="config-row">
         <input type="password" id="configToken" placeholder="GitHub Token (需要 repo 权限)">
@@ -263,6 +255,7 @@
 
     // ==================== 配置管理 ====================
     function showConfig() {
+      console.log('showConfig called');
       document.getElementById('configPanel').classList.add('show');
       document.getElementById('configOwner').value = config.owner;
       document.getElementById('configRepo').value = config.repo;
@@ -272,6 +265,7 @@
       document.getElementById('configPanel').classList.remove('show');
     }
     function saveConfig() {
+      console.log('saveConfig called');
       config.owner = document.getElementById('configOwner').value.trim();
       config.repo = document.getElementById('configRepo').value.trim();
       config.token = document.getElementById('configToken').value.trim();
@@ -284,7 +278,7 @@
 
     // ==================== API 封装 ====================
     const GITHUB_API = 'https://api.github.com';
-    const LABEL_PREFIX = 'blog-post'; // 用于标识博客文章的标签
+    const LABEL_PREFIX = 'blog-post';
 
     async function githubRequest(method, endpoint, body = null) {
       if (!config.owner || !config.repo || !config.token) {
@@ -348,7 +342,7 @@
           `;
         }).join('');
 
-        // 分页
+        // 分页 - 简化处理
         const totalCount = await getTotalCount();
         const totalPages = Math.ceil(totalCount / perPage);
         if (totalPages > 1) {
@@ -365,11 +359,10 @@
 
     async function getTotalCount() {
       try {
-        const issues = await githubRequest('GET', 
+        await githubRequest('GET', 
           `/repos/${config.owner}/${config.repo}/issues?state=open&labels=${LABEL_PREFIX}&per_page=1`
         );
-        // 获取总数需要看响应头，这里简化处理，返回一个较大数字
-        return 100; // 简化处理，实际可通过 Link header 解析
+        return 100;
       } catch {
         return 0;
       }
@@ -389,7 +382,6 @@
           `/repos/${config.owner}/${config.repo}/issues/${issueNumber}`
         );
         
-        // 解析文章内容，支持简单标记
         const content = parseMarkdown(issue.body || '');
         
         detailEl.innerHTML = `
@@ -562,27 +554,21 @@
       if (!md) return '';
       let html = md;
       
-      // 代码块
       html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
         return `<pre><code>${escapeHtml(code)}</code></pre>`;
       });
       
-      // 行内代码
       html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
       
-      // 标题
       html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
       html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
       html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
       
-      // 粗体和斜体
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
       
-      // 链接
       html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color:var(--accent);">$1</a>');
       
-      // 换行
       html = html.replace(/\n/g, '<br>');
       
       return html;
@@ -597,6 +583,16 @@
 
     // ==================== 初始化 ====================
     window.onload = function() {
+      console.log('Page loaded');
+      console.log('Config:', config);
+      
+      // 绑定按钮事件 - 使用更可靠的方式
+      document.querySelectorAll('.header-actions .btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          console.log('Button clicked:', this.textContent);
+        });
+      });
+      
       if (config.owner && config.repo && config.token) {
         loadPosts(1);
       } else {
