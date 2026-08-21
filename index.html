@@ -628,19 +628,19 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.6</div>
+              <div class="changelog-version">v1.0.7</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 新增评论系统<br>
-                💬 使用 GitHub Issues 评论
+                🔑 支持 GitHub OAuth 登录<br>
+                💬 访客可用自己账号评论
               </div>
             </div>
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.5</div>
+              <div class="changelog-version">v1.0.6</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 云端浏览量统计<br>
-                📝 代码块计入字数
+                ✨ 云端浏览量统计
               </div>
             </div>
             <div class="changelog-item">
@@ -877,15 +877,53 @@
       return newViews;
     }
 
-    // ==================== 评论区 ====================
+    // ==================== OAuth 登录 ====================
+    function loginWithGitHub() {
+      window.location.href = PROXY_URL + '/oauth/login';
+    }
+
+    function logoutGitHub() {
+      localStorage.removeItem('github_oauth_token');
+      showMessage('success', '已退出登录');
+      if (document.getElementById('commentsList')) {
+        var currentIssueNumber = localStorage.getItem('current_issue_number');
+        if (currentIssueNumber) showPost(currentIssueNumber);
+      }
+    }
+
+    function isUserLoggedIn() {
+      return !!localStorage.getItem('github_oauth_token');
+    }
+
+    function getUserToken() {
+      return localStorage.getItem('github_oauth_token') || '';
+    }
+
     async function loadComments(issueNumber) {
       try { return await proxyRequest('GET', '/api/issues/' + issueNumber + '/comments'); }
       catch (error) { console.log('加载评论失败:', error); return []; }
     }
 
     async function postComment(issueNumber, content) {
-      try { await proxyRequest('POST', '/api/issues/' + issueNumber + '/comments', { body: content }); return true; }
-      catch (error) { showMessage('error', '评论失败: ' + error.message); return false; }
+      var userToken = getUserToken();
+      if (!userToken) {
+        showMessage('error', '请先使用 GitHub 登录');
+        loginWithGitHub();
+        return false;
+      }
+      try {
+        var url = PROXY_URL + '/api/issues/' + issueNumber + '/comments';
+        var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken };
+        var response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify({ body: content }) });
+        if (!response.ok) {
+          var errData = await response.json().catch(function() { return {}; });
+          throw new Error(errData.message || '评论失败');
+        }
+        return true;
+      } catch (error) {
+        showMessage('error', '评论失败: ' + error.message);
+        return false;
+      }
     }
 
     function renderComments(comments) {
@@ -1094,6 +1132,7 @@
 
     async function showPost(issueNumber) {
       var listEl = document.getElementById('postList');
+      localStorage.setItem('current_issue_number', issueNumber);
       listEl.innerHTML = '<div class="loading">加载文章...</div>';
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
@@ -1111,6 +1150,11 @@
         
         // 加载评论
         var comments = await loadComments(issueNumber);
+        var userLoggedIn = isUserLoggedIn();
+        var commentButtons = userLoggedIn ?
+          '<button class="btn" id="submitCommentBtn">💬 发表评论</button>' +
+          '<button class="btn btn-secondary" id="logoutBtn">退出登录</button>' :
+          '<button class="btn" id="loginBtn">🔑 使用 GitHub 登录</button>';
         
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
@@ -1129,9 +1173,9 @@
           '<div class="comments-title">💬 评论 (' + comments.length + ')</div>' +
           '<div id="commentsList">' + renderComments(comments) + '</div>' +
           '<div class="comment-input-area">' +
-          '<textarea id="commentInput" placeholder="发表评论..."></textarea>' +
+          (userLoggedIn ? '<textarea id="commentInput" placeholder="发表评论..."></textarea>' : '') +
           '<div style="margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">' +
-          '<button class="btn" id="submitCommentBtn">💬 发表评论</button>' +
+          commentButtons +
           '<a href="https://github.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/issues/' + issueNumber + '" target="_blank" style="font-size:0.8rem;color:var(--accent);text-decoration:none;">在 GitHub 上查看</a>' +
           '</div></div></div></div>';
         
@@ -1141,25 +1185,30 @@
           document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
         }
         
-        // 绑定评论提交
-        document.getElementById('submitCommentBtn').addEventListener('click', function() {
-          var commentInput = document.getElementById('commentInput');
-          var content = commentInput.value.trim();
-          if (!content) { showMessage('error', '请输入评论内容'); return; }
-          if (content.length < 2) { showMessage('error', '评论太短了'); return; }
-          if (content.length > 500) { showMessage('error', '评论太长（最多500字）'); return; }
-          postComment(issueNumber, content).then(function(success) {
-            if (success) {
-              commentInput.value = '';
-              showMessage('success', '评论发表成功！');
-              loadComments(issueNumber).then(function(newComments) {
-                document.getElementById('commentsList').innerHTML = renderComments(newComments);
-                var commentsTitle = document.querySelector('.comments-title');
-                if (commentsTitle) commentsTitle.textContent = '💬 评论 (' + newComments.length + ')';
-              });
-            }
+        // 评论按钮事件
+        if (userLoggedIn) {
+          document.getElementById('submitCommentBtn').addEventListener('click', function() {
+            var commentInput = document.getElementById('commentInput');
+            var content = commentInput.value.trim();
+            if (!content) { showMessage('error', '请输入评论内容'); return; }
+            if (content.length < 2) { showMessage('error', '评论太短了'); return; }
+            if (content.length > 500) { showMessage('error', '评论太长（最多500字）'); return; }
+            postComment(issueNumber, content).then(function(success) {
+              if (success) {
+                commentInput.value = '';
+                showMessage('success', '评论发表成功！');
+                loadComments(issueNumber).then(function(newComments) {
+                  document.getElementById('commentsList').innerHTML = renderComments(newComments);
+                  var commentsTitle = document.querySelector('.comments-title');
+                  if (commentsTitle) commentsTitle.textContent = '💬 评论 (' + newComments.length + ')';
+                });
+              }
+            });
           });
-        });
+          document.getElementById('logoutBtn').addEventListener('click', function() { logoutGitHub(); });
+        } else {
+          document.getElementById('loginBtn').addEventListener('click', function() { loginWithGitHub(); });
+        }
         
         if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) { MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {}); }
       } catch (error) { listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>'; }
@@ -1230,6 +1279,16 @@
     window.addEventListener('DOMContentLoaded', function() {
       initTheme();
       updateSidebarProfile();
+      
+      // 检查 OAuth 回调
+      var urlParams = new URLSearchParams(window.location.search);
+      var oauthToken = urlParams.get('oauth_token');
+      if (oauthToken) {
+        localStorage.setItem('github_oauth_token', oauthToken);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        showMessage('success', 'GitHub 登录成功！');
+      }
+      
       document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
       document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
       document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
