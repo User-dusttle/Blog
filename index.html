@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Mirage_Rover · OI Blog</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" id="hljs-dark">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css" id="hljs-light" disabled>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>
     MathJax = {
@@ -32,7 +33,41 @@
       --radius: 16px;
       --shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
       --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --modal-overlay: rgba(0, 0, 0, 0.7);
+      --error-bg: #2d1518;
+      --error-border: #e06c75;
+      --error-text: #ffb3b3;
+      --success-bg: #12261e;
+      --success-border: #5cb87a;
+      --success-text: #7ee2a8;
+      --banner-gradient: linear-gradient(135deg, #1e3a5f, #2c4a6e);
     }
+
+    :root[data-theme="light"] {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-hover: #f0f2f5;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text-secondary: #4a5568;
+      --accent: #3182ce;
+      --accent-soft: #ebf8ff;
+      --green: #38a169;
+      --red: #e53e3e;
+      --code-bg: #f7fafc;
+      --radius: 16px;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --modal-overlay: rgba(0, 0, 0, 0.4);
+      --error-bg: #fed7d7;
+      --error-border: #feb2b2;
+      --error-text: #c53030;
+      --success-bg: #c6f6d5;
+      --success-border: #9ae6b4;
+      --success-text: #276749;
+      --banner-gradient: linear-gradient(135deg, #bee3f8, #90cdf4);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background-color: var(--bg);
@@ -42,6 +77,7 @@
       padding: 1.2rem 1rem 2rem;
       min-height: 100vh;
       overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
     .blog-container {
       max-width: 1200px;
@@ -67,6 +103,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease;
+      transition: background-color 0.4s ease, border-color 0.4s ease;
     }
     .logo-area { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; user-select: none; transition: transform 0.3s ease; }
     .logo-area:hover { transform: scale(1.03); }
@@ -111,7 +148,7 @@
 
     .btn {
       background: var(--accent);
-      color: #0d1117;
+      color: #ffffff;
       border: none;
       padding: 0.7rem 1.5rem;
       border-radius: 8px;
@@ -158,7 +195,7 @@
       padding: 1.8rem 2rem;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease backwards;
     }
     .post-card:nth-child(1) { animation-delay: 0.05s; }
@@ -167,7 +204,7 @@
     .post-card:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       transform: translateY(-4px) scale(1.01);
     }
     .post-meta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.8rem; align-items: center; }
@@ -181,13 +218,13 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    .post-tag:hover { background: var(--accent); color: #0d1117; }
+    .post-tag:hover { background: var(--accent); color: #ffffff; }
     .weight-badge {
       font-size: 0.7rem;
       padding: 0.2rem 0.7rem;
       border-radius: 20px;
       background: var(--green);
-      color: #0d1117;
+      color: #ffffff;
       font-weight: 700;
     }
     .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
@@ -202,7 +239,7 @@
       border: 1px solid var(--border);
       transition: all 0.3s ease;
     }
-    .sidebar-card:hover { border-color: #3a4a5e; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .sidebar-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-2px); }
     .sidebar-card h3 { margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none; }
     .sidebar-card h3 .arrow { transition: transform 0.3s ease; display: inline-block; }
     .sidebar-card h3 .arrow.collapsed { transform: rotate(-90deg); }
@@ -222,7 +259,7 @@
       background-color: var(--accent-soft);
     }
     .avatar:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 20px rgba(79, 156, 247, 0.3); }
-    .author-name { font-weight: 700; font-size: 1.2rem; }
+    .author-name { font-weight: 700; font-size: 1.2rem; color: var(--text); }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
     .changelog { max-height: 300px; overflow-y: auto; transition: max-height 0.4s ease; }
@@ -242,8 +279,8 @@
       padding: 2rem;
       animation: fadeInUp 0.5s ease;
     }
-    .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; }
-    .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; }
+    .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--text); }
+    .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; color: var(--text); }
     .markdown-body pre {
       background: var(--code-bg);
       padding: 1.2rem;
@@ -260,19 +297,20 @@
       border-radius: 4px;
       font-size: 0.9rem;
       font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+      color: var(--text);
     }
     .markdown-body pre code { background: none; padding: 0; font-size: 0.85rem; }
     .markdown-body a {
-      color: #6cb2f7;
+      color: var(--accent);
       text-decoration: none;
-      border-bottom: 1px dashed rgba(108, 178, 247, 0.5);
+      border-bottom: 1px dashed var(--accent);
       padding: 0 2px;
       transition: all 0.3s ease;
     }
     .markdown-body a:hover {
-      color: #8ec5ff;
-      border-bottom: 1px solid #8ec5ff;
-      background: rgba(108, 178, 247, 0.15);
+      opacity: 0.8;
+      border-bottom: 1px solid var(--accent);
+      background: var(--accent-soft);
       border-radius: 4px;
       padding: 0 4px;
     }
@@ -389,9 +427,9 @@
       align-items: center;
       justify-content: center;
       font-size: 3rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow);
     }
-    .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--text); }
     .profile-bio { color: var(--text-secondary); font-size: 0.95rem; padding: 1rem 2rem 2rem; }
     .profile-edit-btn {
       position: absolute;
@@ -401,8 +439,8 @@
     }
 
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
-    .error-msg { background: #2d1518; border: 1px solid var(--red); color: #ffb3b3; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-    .success-msg { background: #12261e; border: 1px solid var(--green); color: #7ee2a8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .error-msg { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .success-msg { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
 
     .password-modal {
       position: fixed;
@@ -410,7 +448,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: var(--modal-overlay);
       display: none;
       align-items: center;
       justify-content: center;
@@ -426,7 +464,7 @@
       max-width: 400px;
       animation: fadeInUp 0.3s ease;
     }
-    .password-box h2 { margin-bottom: 1rem; }
+    .password-box h2 { margin-bottom: 1rem; color: var(--text); }
     .password-box input {
       width: 100%;
       background: var(--bg);
@@ -460,6 +498,7 @@
       <nav class="nav-links">
         <a id="homeBtn" class="active">🏠 首页</a>
         <a id="adminBtn">🔐 管理</a>
+        <a id="themeToggle" title="切换主题">🌙</a>
       </nav>
       <div class="search-box">
         <span>🔍</span>
@@ -485,23 +524,14 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.6.0</div>
-              <div class="changelog-date">2025-08-21</div>
+              <div class="changelog-version">v1.0.1</div>
+              <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 新增权重排序<br>
-                ⚖️ 管理员可调整权重
+                ✨ 新增暗色/浅色模式
               </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.5.0</div>
-              <div class="changelog-date">2025-08-21</div>
-              <div class="changelog-desc">
-                ✨ 个人资料云端存储
-              </div>
-            </div>
             <div class="changelog-item">
               <div class="changelog-version">v1.0.0</div>
-              <div class="changelog-date">2025-08-20</div>
+              <div class="changelog-date">2026-08-20</div>
               <div class="changelog-desc">
                 ✨ 初始版本发布
               </div>
@@ -545,6 +575,41 @@
       bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记',
       name: 'Mirage_Rover'
     };
+
+    // ==================== 主题切换 ====================
+    function initTheme() {
+      var savedTheme = localStorage.getItem('blog_theme');
+      var themeToggle = document.getElementById('themeToggle');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeToggle.textContent = '☀️';
+        document.getElementById('hljs-dark').disabled = true;
+        document.getElementById('hljs-light').disabled = false;
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '🌙';
+        document.getElementById('hljs-dark').disabled = false;
+        document.getElementById('hljs-light').disabled = true;
+      }
+    }
+
+    function toggleTheme() {
+      var currentTheme = document.documentElement.getAttribute('data-theme');
+      var themeToggle = document.getElementById('themeToggle');
+      if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '🌙';
+        localStorage.setItem('blog_theme', 'dark');
+        document.getElementById('hljs-dark').disabled = false;
+        document.getElementById('hljs-light').disabled = true;
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeToggle.textContent = '☀️';
+        localStorage.setItem('blog_theme', 'light');
+        document.getElementById('hljs-dark').disabled = true;
+        document.getElementById('hljs-light').disabled = false;
+      }
+    }
 
     function escapeHtml(text) {
       if (!text) return '';
@@ -669,7 +734,7 @@
       var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
       var editBtn = isAdmin ? '<button class="btn profile-edit-btn" id="editProfileBtn">✏️ 编辑资料</button>' : '';
       listEl.innerHTML = '<div class="profile-page">' +
-        '<div class="profile-banner" style="' + (profile.banner ? 'background-image:url(' + profile.banner + ')' : 'background:linear-gradient(135deg, #1e3a5f, #2c4a6e)') + ';">' +
+        '<div class="profile-banner" style="' + (profile.banner ? 'background-image:url(' + profile.banner + ')' : 'background:var(--banner-gradient)') + ';">' +
         '<div class="banner-overlay"></div>' + editBtn + '</div>' +
         '<div class="profile-info">' +
         '<div class="profile-avatar-large" style="' + (profile.avatar ? 'background-image:url(' + profile.avatar + ')' : '') + '">' + (profile.avatar ? '' : '🧑‍💻') + '</div>' +
@@ -718,7 +783,6 @@
         allPosts = issues.filter(function(issue) {
           return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
         });
-        // 按权重排序
         allPosts.sort(function(a, b) {
           var wa = getWeightFromLabels(a.labels);
           var wb = getWeightFromLabels(b.labels);
@@ -799,7 +863,7 @@
         return;
       }
       tagCloud.innerHTML = tagNames.map(function(tag) {
-        return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#0d1117;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
+        return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#ffffff;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
       }).join('');
       tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
         tag.addEventListener('click', function() {
@@ -951,7 +1015,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
+      initTheme();
       updateSidebarProfile();
+      document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
       document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
       document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
       document.getElementById('adminBtn').addEventListener('click', function(e) { e.preventDefault(); if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); } });
