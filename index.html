@@ -272,6 +272,37 @@
 
     .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
+    /* 侧边栏 TOC */
+    #sidebarTOC {
+      position: sticky;
+      top: 1rem;
+    }
+    #sidebarTOC .sidebar-card {
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    #sidebarTOC .toc-item {
+      display: block;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 6px;
+      border-bottom: none;
+    }
+    #sidebarTOC .toc-item:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding-left: 0.8rem;
+    }
+    #sidebarTOC .toc-item.active {
+      color: var(--accent);
+      font-weight: 600;
+      background: var(--accent-soft);
+    }
+
     .post-detail {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -281,6 +312,9 @@
     }
     .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--text); }
     .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; color: var(--text); }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      scroll-margin-top: 80px;
+    }
     .markdown-body pre {
       background: var(--code-bg);
       padding: 1.2rem;
@@ -315,7 +349,6 @@
       padding: 0 4px;
     }
 
-    /* 代码复制按钮 */
     .code-block-wrapper {
       position: relative;
       margin: 1rem 0;
@@ -335,16 +368,13 @@
       z-index: 10;
       opacity: 0;
     }
-    .code-block-wrapper:hover .copy-code-btn {
-      opacity: 1;
-    }
+    .code-block-wrapper:hover .copy-code-btn { opacity: 1; }
     .copy-code-btn:hover {
       background: var(--accent);
       color: #ffffff;
       border-color: var(--accent);
     }
 
-    /* 分页 */
     .pagination {
       display: flex;
       justify-content: center;
@@ -357,37 +387,6 @@
       font-size: 0.85rem;
       min-width: 36px;
       text-align: center;
-    }
-    .pagination .btn:not(.btn-secondary) {
-      background: var(--accent);
-      color: #ffffff;
-    }
-
-    /* TOC */
-    .toc-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-    .toc-title {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 0.8rem;
-      color: var(--accent);
-    }
-    .toc-item {
-      display: block;
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.85rem;
-      padding: 0.3rem 0;
-      border-bottom: none;
-      transition: color 0.3s ease;
-    }
-    .toc-item:hover {
-      color: var(--accent);
     }
 
     .search-box {
@@ -554,6 +553,7 @@
     @media (max-width: 900px) {
       .main-grid { grid-template-columns: 1fr; }
       .site-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      #sidebarTOC { position: static; }
     }
     @media (max-width: 500px) {
       .post-card { padding: 1.2rem; }
@@ -589,6 +589,9 @@
         <div class="loading">加载中...</div>
       </main>
       <aside class="sidebar">
+        <!-- TOC 容器 -->
+        <div id="sidebarTOC"></div>
+        
         <div class="sidebar-card">
           <div class="author-box" id="profileCard">
             <div class="avatar" id="sidebarAvatar">🧑‍💻</div>
@@ -665,7 +668,6 @@
       name: 'Mirage_Rover'
     };
 
-    // ==================== 主题切换 ====================
     function initTheme() {
       var savedTheme = localStorage.getItem('blog_theme');
       var themeToggle = document.getElementById('themeToggle');
@@ -717,6 +719,13 @@
     function renderMarkdown(text) {
       if (typeof marked === 'undefined') return escapeHtml(text).replace(/\n/g, '<br>');
       const renderer = new marked.Renderer();
+      
+      // 自定义标题渲染，添加 id 用于 TOC 跳转
+      renderer.heading = function(text, level) {
+        var id = 'heading-' + text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substr(2, 5);
+        return '<h' + level + ' id="' + id + '">' + text + '</h' + level + '>';
+      };
+      
       renderer.code = function(code, language) {
         let highlightedCode;
         if (typeof hljs !== 'undefined') {
@@ -733,6 +742,7 @@
           '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
           '</div>';
       };
+      
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
       return marked.parse(text);
     }
@@ -765,32 +775,48 @@
       setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
     }
 
-    function generateTOC(content) {
+    function generateTOC(contentHTML) {
       var headings = [];
       var tempDiv = document.createElement('div');
-      tempDiv.innerHTML = content;
+      tempDiv.innerHTML = contentHTML;
       var headingElements = tempDiv.querySelectorAll('h1, h2, h3');
-      headingElements.forEach(function(heading, index) {
-        heading.id = 'heading-' + index;
+      headingElements.forEach(function(heading) {
         headings.push({
           level: heading.tagName,
           text: heading.textContent,
-          id: 'heading-' + index
+          id: heading.id
         });
       });
       return headings;
     }
 
-    function renderTOC(headings) {
-      if (headings.length === 0) return '';
-      var tocHTML = '<div class="toc-container">';
-      tocHTML += '<div class="toc-title">📑 目录</div>';
+    function renderSidebarTOC(headings) {
+      var tocContainer = document.getElementById('sidebarTOC');
+      if (headings.length === 0) {
+        tocContainer.innerHTML = '';
+        return;
+      }
+      var tocHTML = '<div class="sidebar-card"><h3 style="cursor:default;">📑 目录</h3>';
       headings.forEach(function(heading) {
         var indent = heading.level === 'H1' ? 0 : heading.level === 'H2' ? 1 : 2;
-        tocHTML += '<a href="#' + heading.id + '" class="toc-item" style="padding-left:' + (indent * 20) + 'px;">' + escapeHtml(heading.text) + '</a>';
+        tocHTML += '<a href="#' + heading.id + '" class="toc-item" data-target="' + heading.id + '" style="padding-left:' + (indent * 20 + 8) + 'px;">' + escapeHtml(heading.text) + '</a>';
       });
       tocHTML += '</div>';
-      return tocHTML;
+      tocContainer.innerHTML = tocHTML;
+      
+      tocContainer.querySelectorAll('.toc-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          var targetId = this.getAttribute('data-target');
+          var targetElement = document.getElementById(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 高亮当前项
+            tocContainer.querySelectorAll('.toc-item').forEach(function(i) { i.classList.remove('active'); });
+            this.classList.add('active');
+          }
+        });
+      });
     }
 
     function getWeightFromLabels(labels) {
@@ -879,6 +905,7 @@
 
     function showProfile() {
       var listEl = document.getElementById('postList');
+      document.getElementById('sidebarTOC').innerHTML = '';
       var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
       var editBtn = isAdmin ? '<button class="btn profile-edit-btn" id="editProfileBtn">✏️ 编辑资料</button>' : '';
       listEl.innerHTML = '<div class="profile-page">' +
@@ -925,6 +952,7 @@
 
     async function loadPosts() {
       var listEl = document.getElementById('postList');
+      document.getElementById('sidebarTOC').innerHTML = '';
       listEl.innerHTML = '<div class="loading">加载中...</div>';
       try {
         var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
@@ -992,7 +1020,6 @@
           '</article>';
       }).join('');
       
-      // 分页控件
       if (totalPages > 1) {
         listEl.innerHTML += '<div class="pagination">' + renderPagination() + '</div>';
       }
@@ -1073,7 +1100,7 @@
         var rawContent = issue.body || '';
         var content = renderMarkdown(rawContent);
         var headings = generateTOC(content);
-        var tocHTML = renderTOC(headings);
+        renderSidebarTOC(headings);
         var weight = getWeightFromLabels(issue.labels);
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
         var tags = issue.labels
@@ -1092,10 +1119,12 @@
           weightDisplay +
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
-          tocHTML +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
           adminButtons + '</div>';
-        document.getElementById('backBtn').addEventListener('click', loadPosts);
+        document.getElementById('backBtn').addEventListener('click', function() {
+          loadPosts();
+          document.getElementById('sidebarTOC').innerHTML = '';
+        });
         if (isAdmin) {
           document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
           document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
@@ -1127,6 +1156,7 @@
     function showEditor(issueNumber, existingData) {
       if (!isAdmin) { showPasswordModal(); return; }
       var listEl = document.getElementById('postList');
+      document.getElementById('sidebarTOC').innerHTML = '';
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
