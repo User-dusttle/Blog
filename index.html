@@ -170,7 +170,7 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
       transform: translateY(-4px) scale(1.01);
     }
-    .post-meta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.8rem; }
+    .post-meta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.8rem; align-items: center; }
     .post-date { font-size: 0.8rem; color: var(--text-secondary); }
     .post-tag {
       font-size: 0.7rem;
@@ -182,6 +182,14 @@
       transition: all 0.3s ease;
     }
     .post-tag:hover { background: var(--accent); color: #0d1117; }
+    .weight-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      background: var(--green);
+      color: #0d1117;
+      font-weight: 700;
+    }
     .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
@@ -313,7 +321,15 @@
       line-height: 1.6;
     }
     .editor label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; margin-top: 0.8rem; }
-    .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); }
+    .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: var(--accent); }
+    .editor select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
 
     .tag-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
     .tag-input-row input { flex: 1; min-width: 150px; margin-bottom: 0 !important; }
@@ -469,27 +485,18 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
+              <div class="changelog-version">v1.6.0</div>
+              <div class="changelog-date">2025-08-21</div>
+              <div class="changelog-desc">
+                ✨ 新增权重排序<br>
+                ⚖️ 管理员可调整权重
+              </div>
+            </div>
+            <div class="changelog-item">
               <div class="changelog-version">v1.5.0</div>
               <div class="changelog-date">2025-08-21</div>
               <div class="changelog-desc">
-                ✨ 个人资料云端存储<br>
-                🖼️ 头像/背景图同步<br>
-                📝 个人介绍全局可见
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.4.0</div>
-              <div class="changelog-date">2025-08-20</div>
-              <div class="changelog-desc">
-                ✨ 新增个人主页<br>
-                🖼️ 支持自定义头像和背景图
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.3.0</div>
-              <div class="changelog-date">2025-08-20</div>
-              <div class="changelog-desc">
-                ✨ 修复代码高亮
+                ✨ 个人资料云端存储
               </div>
             </div>
             <div class="changelog-item">
@@ -523,7 +530,7 @@
   </div>
 
   <script>
-    const PROXY_URL = 'https://wavy-donkey-4453.user-dusttle.deno.net';
+    const PROXY_URL = 'https://wavy-donkey-4453.user-dusttle.deno.dev';
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
     const PROFILE_LABEL = 'profile-data';
@@ -573,6 +580,16 @@
       return marked.parse(text);
     }
 
+    function getWeightFromLabels(labels) {
+      if (!labels) return 2;
+      for (var i = 0; i < labels.length; i++) {
+        if (labels[i].name && labels[i].name.startsWith('weight:')) {
+          return parseInt(labels[i].name.replace('weight:', '')) || 2;
+        }
+      }
+      return 2;
+    }
+
     function updateSidebarProfile() {
       var avatarEl = document.getElementById('sidebarAvatar');
       var nameEl = document.getElementById('sidebarName');
@@ -602,7 +619,6 @@
       return response.json();
     }
 
-    // ==================== 个人资料（云端存储） ====================
     async function loadProfile() {
       try {
         var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
@@ -616,10 +632,8 @@
         if (profileIssue && profileIssue.body) {
           try {
             var parsed = JSON.parse(profileIssue.body);
-            if (parsed && typeof parsed === 'object') {
-              profile = parsed;
-            }
-          } catch (e) { /* 使用默认值 */ }
+            if (parsed && typeof parsed === 'object') profile = parsed;
+          } catch (e) {}
         }
         updateSidebarProfile();
       } catch (error) {
@@ -644,13 +658,12 @@
         } else {
           await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true);
         }
-        showMessage('success', '个人资料已保存到云端');
+        showMessage('success', '个人资料已保存');
       } catch (error) {
         showMessage('error', '保存失败: ' + error.message);
       }
     }
 
-    // ==================== 个人主页 ====================
     function showProfile() {
       var listEl = document.getElementById('postList');
       var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
@@ -666,9 +679,7 @@
         '<div style="padding:0 2rem 2rem;">' +
         '<button class="btn btn-secondary" id="backFromProfileBtn">← 返回首页</button></div></div>';
       document.getElementById('backFromProfileBtn').addEventListener('click', loadPosts);
-      if (isAdmin) {
-        document.getElementById('editProfileBtn').addEventListener('click', showProfileEditor);
-      }
+      if (isAdmin) document.getElementById('editProfileBtn').addEventListener('click', showProfileEditor);
     }
 
     function showProfileEditor() {
@@ -699,7 +710,6 @@
       document.getElementById('cancelProfileEditBtn').addEventListener('click', showProfile);
     }
 
-    // ==================== 文章加载 ====================
     async function loadPosts() {
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载中...</div>';
@@ -707,6 +717,13 @@
         var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
         allPosts = issues.filter(function(issue) {
           return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
+        });
+        // 按权重排序
+        allPosts.sort(function(a, b) {
+          var wa = getWeightFromLabels(a.labels);
+          var wb = getWeightFromLabels(b.labels);
+          if (wb !== wa) return wb - wa;
+          return new Date(b.created_at) - new Date(a.created_at);
         });
         renderPosts();
         renderTagCloud();
@@ -734,14 +751,22 @@
         return;
       }
       listEl.innerHTML = filteredPosts.map(function(issue) {
+        var weight = getWeightFromLabels(issue.labels);
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX; })
-          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
+        var tags = issue.labels
+          .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
+          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; })
+          .join('');
+        var weightBadge = isAdmin ? '<span class="weight-badge">⚖️ ' + weight + '</span>' : '';
         return '<article class="post-card" data-issue="' + issue.number + '">' +
-          '<div class="post-meta"><span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
+          '<div class="post-meta">' +
+          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
+          weightBadge +
+          '</div>' +
           '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
           '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
-          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') + '</article>';
+          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
+          '</article>';
       }).join('');
       document.querySelectorAll('.post-card').forEach(function(card) {
         card.addEventListener('click', function(e) {
@@ -762,7 +787,7 @@
       var allTags = {};
       allPosts.forEach(function(issue) {
         issue.labels.forEach(function(label) {
-          if (label.name !== LABEL_PREFIX) {
+          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:')) {
             if (!allTags[label.name]) allTags[label.name] = 0;
             allTags[label.name]++;
           }
@@ -791,8 +816,12 @@
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         var content = renderMarkdown(issue.body || '');
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX; })
-          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
+        var weight = getWeightFromLabels(issue.labels);
+        var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
+        var tags = issue.labels
+          .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
+          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; })
+          .join(' ');
         var adminButtons = isAdmin ? 
           '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
           '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
@@ -802,8 +831,11 @@
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
           '<div class="post-meta" style="margin-bottom:1rem;">' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
-          (tags ? '<span style="display:flex;gap:0.5rem;">' + tags + '</span>' : '') + '</div>' +
-          '<div class="markdown-body" id="markdownContent">' + content + '</div>' + adminButtons + '</div>';
+          weightDisplay +
+          (tags ? '<span>' + tags + '</span>' : '') +
+          '</div>' +
+          '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
+          adminButtons + '</div>';
         document.getElementById('backBtn').addEventListener('click', loadPosts);
         if (isAdmin) {
           document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
@@ -839,16 +871,31 @@
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
-      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX; }).map(function(l) { return l.name; }) : [];
+      var existingTags = existingData ? existingData.labels
+        .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
+        .map(function(l) { return l.name; }) : [];
+      var existingWeight = existingData ? getWeightFromLabels(existingData.labels) : 2;
+      
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
         '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
+        '<div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:center;flex-wrap:wrap;">' +
+        '<label style="font-size:0.85rem;color:var(--text-secondary);margin:0;">⚖️ 权重：</label>' +
+        '<select id="editWeight">' +
+        '<option value="1"' + (existingWeight === 1 ? ' selected' : '') + '>1 - 置底</option>' +
+        '<option value="2"' + (existingWeight === 2 ? ' selected' : '') + '>2 - 默认</option>' +
+        '<option value="3"' + (existingWeight === 3 ? ' selected' : '') + '>3 - 置顶</option>' +
+        '<option value="4"' + (existingWeight === 4 ? ' selected' : '') + '>4 - 高优先级</option>' +
+        '<option value="5"' + (existingWeight === 5 ? ' selected' : '') + '>5 - 最高</option>' +
+        '</select>' +
+        '</div>' +
         '<div class="tag-input-row"><input type="text" id="tagInput" placeholder="添加标签"><button class="btn btn-secondary" id="addTagBtn">添加</button></div>' +
         '<div class="tag-list" id="tagList"></div>' +
         '<textarea id="editContent" placeholder="支持 Markdown 和 LaTeX 公式">' + contentValue + '</textarea>' +
         '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
         '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存' : '📤 发布') + '</button>' +
         '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
+      
       var currentTags = existingTags.slice();
       function renderTags() {
         var tagList = document.getElementById('tagList');
@@ -857,7 +904,8 @@
         }).join('');
         tagList.querySelectorAll('.remove-tag').forEach(function(btn) {
           btn.addEventListener('click', function() {
-            currentTags = currentTags.filter(function(t) { return t !== this.getAttribute('data-tag'); }.bind(this));
+            var tagToRemove = this.getAttribute('data-tag');
+            currentTags = currentTags.filter(function(t) { return t !== tagToRemove; });
             renderTags();
           });
         });
@@ -874,8 +922,9 @@
       document.getElementById('saveBtn').addEventListener('click', function() {
         var title = document.getElementById('editTitle').value.trim();
         var content = document.getElementById('editContent').value.trim();
+        var weight = parseInt(document.getElementById('editWeight').value);
         if (!title || !content) { showMessage('error', '请填写标题和内容'); return; }
-        var labels = [LABEL_PREFIX].concat(currentTags);
+        var labels = [LABEL_PREFIX, 'weight:' + weight].concat(currentTags);
         if (isEdit) { updatePost(issueNumber, title, content, labels); } else { publishPost(title, content, labels); }
       });
       document.getElementById('cancelEditBtn').addEventListener('click', function() { if (isEdit) { showPost(issueNumber); } else { loadPosts(); } });
@@ -901,7 +950,6 @@
       catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); }
     }
 
-    // ==================== 初始化 ====================
     window.addEventListener('DOMContentLoaded', function() {
       updateSidebarProfile();
       document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
