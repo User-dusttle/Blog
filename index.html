@@ -51,22 +51,10 @@
       gap: 1.8rem;
       animation: fadeInUp 0.6s ease;
     }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
     .site-header {
       display: flex;
@@ -223,6 +211,7 @@
       transition: all 0.4s ease;
       background-size: cover;
       background-position: center;
+      background-color: var(--accent-soft);
     }
     .avatar:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 20px rgba(79, 156, 247, 0.3); }
     .author-name { font-weight: 700; font-size: 1.2rem; }
@@ -290,18 +279,8 @@
       padding: 0.5rem 1rem;
       transition: all 0.3s ease;
     }
-    .search-box:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1);
-    }
-    .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 0.9rem;
-      width: 150px;
-    }
+    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1); }
+    .search-box input { background: transparent; border: none; outline: none; color: var(--text); font-size: 0.9rem; width: 150px; }
 
     .editor {
       background: var(--surface);
@@ -318,7 +297,7 @@
       padding: 0.8rem;
       border-radius: 8px;
       font-size: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
     .editor textarea {
       width: 100%;
@@ -333,6 +312,7 @@
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
       line-height: 1.6;
     }
+    .editor label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; margin-top: 0.8rem; }
     .editor input:focus, .editor textarea:focus { outline: none; border-color: var(--accent); }
 
     .tag-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
@@ -351,7 +331,6 @@
     .tag-chip .remove-tag { cursor: pointer; font-weight: bold; }
     .tag-chip .remove-tag:hover { color: var(--red); }
 
-    /* 个人主页样式 */
     .profile-page {
       background: var(--surface);
       border-radius: var(--radius);
@@ -389,22 +368,20 @@
       border: 4px solid var(--surface);
       background-size: cover;
       background-position: center;
+      background-color: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-    .profile-name {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-    .profile-bio {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      padding: 1rem 2rem 2rem;
-    }
+    .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .profile-bio { color: var(--text-secondary); font-size: 0.95rem; padding: 1rem 2rem 2rem; }
     .profile-edit-btn {
       position: absolute;
       top: 1rem;
       right: 1rem;
+      z-index: 10;
     }
 
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
@@ -492,36 +469,27 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
+              <div class="changelog-version">v1.5.0</div>
+              <div class="changelog-date">2025-08-21</div>
+              <div class="changelog-desc">
+                ✨ 个人资料云端存储<br>
+                🖼️ 头像/背景图同步<br>
+                📝 个人介绍全局可见
+              </div>
+            </div>
+            <div class="changelog-item">
               <div class="changelog-version">v1.4.0</div>
               <div class="changelog-date">2025-08-20</div>
               <div class="changelog-desc">
                 ✨ 新增个人主页<br>
-                🖼️ 支持自定义头像和背景图<br>
-                📝 可编辑个人介绍
+                🖼️ 支持自定义头像和背景图
               </div>
             </div>
             <div class="changelog-item">
               <div class="changelog-version">v1.3.0</div>
               <div class="changelog-date">2025-08-20</div>
               <div class="changelog-desc">
-                ✨ 修复代码高亮<br>
-                🎨 优化代码块样式
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.2.0</div>
-              <div class="changelog-date">2025-08-20</div>
-              <div class="changelog-desc">
-                ✨ 新增代码高亮
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.1.0</div>
-              <div class="changelog-date">2025-08-20</div>
-              <div class="changelog-desc">
-                ✨ 新增搜索功能<br>
-                🏷️ 新增标签筛选<br>
-                📂 更新日志折叠
+                ✨ 修复代码高亮
               </div>
             </div>
             <div class="changelog-item">
@@ -558,19 +526,17 @@
     const PROXY_URL = 'https://wavy-donkey-4453.user-dusttle.deno.net';
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
-    const PROFILE_LABEL = 'profile';
+    const PROFILE_LABEL = 'profile-data';
     
     let isAdmin = false;
     let allPosts = [];
     let activeTag = null;
     let searchQuery = '';
-    
-    // 个人资料（从 localStorage 加载）
     let profile = {
-      avatar: localStorage.getItem('profile_avatar') || '',
-      banner: localStorage.getItem('profile_banner') || '',
-      bio: localStorage.getItem('profile_bio') || 'OIer / 算法竞赛选手\n分享题解与学习笔记',
-      name: localStorage.getItem('profile_name') || 'Mirage_Rover'
+      avatar: '',
+      banner: '',
+      bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记',
+      name: 'Mirage_Rover'
     };
 
     function escapeHtml(text) {
@@ -588,9 +554,7 @@
     }
 
     function renderMarkdown(text) {
-      if (typeof marked === 'undefined') {
-        return escapeHtml(text).replace(/\n/g, '<br>');
-      }
+      if (typeof marked === 'undefined') return escapeHtml(text).replace(/\n/g, '<br>');
       const renderer = new marked.Renderer();
       renderer.code = function(code, language) {
         let highlightedCode;
@@ -601,12 +565,8 @@
             } else {
               highlightedCode = hljs.highlightAuto(code).value;
             }
-          } catch (e) {
-            highlightedCode = escapeHtml(code);
-          }
-        } else {
-          highlightedCode = escapeHtml(code);
-        }
+          } catch (e) { highlightedCode = escapeHtml(code); }
+        } else { highlightedCode = escapeHtml(code); }
         return '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>';
       };
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
@@ -617,7 +577,6 @@
       var avatarEl = document.getElementById('sidebarAvatar');
       var nameEl = document.getElementById('sidebarName');
       var bioEl = document.getElementById('sidebarBio');
-      
       if (profile.avatar) {
         avatarEl.style.backgroundImage = 'url(' + profile.avatar + ')';
         avatarEl.textContent = '';
@@ -643,6 +602,104 @@
       return response.json();
     }
 
+    // ==================== 个人资料（云端存储） ====================
+    async function loadProfile() {
+      try {
+        var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
+        var profileIssue = null;
+        for (var i = 0; i < issues.length; i++) {
+          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) {
+            profileIssue = issues[i];
+            break;
+          }
+        }
+        if (profileIssue && profileIssue.body) {
+          try {
+            var parsed = JSON.parse(profileIssue.body);
+            if (parsed && typeof parsed === 'object') {
+              profile = parsed;
+            }
+          } catch (e) { /* 使用默认值 */ }
+        }
+        updateSidebarProfile();
+      } catch (error) {
+        console.log('加载个人资料失败:', error);
+        updateSidebarProfile();
+      }
+    }
+
+    async function saveProfileToGitHub() {
+      try {
+        var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
+        var profileIssue = null;
+        for (var i = 0; i < issues.length; i++) {
+          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) {
+            profileIssue = issues[i];
+            break;
+          }
+        }
+        var body = JSON.stringify(profile);
+        if (profileIssue) {
+          await proxyRequest('PATCH', '/admin/issues/' + profileIssue.number, { body: body }, true);
+        } else {
+          await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true);
+        }
+        showMessage('success', '个人资料已保存到云端');
+      } catch (error) {
+        showMessage('error', '保存失败: ' + error.message);
+      }
+    }
+
+    // ==================== 个人主页 ====================
+    function showProfile() {
+      var listEl = document.getElementById('postList');
+      var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
+      var editBtn = isAdmin ? '<button class="btn profile-edit-btn" id="editProfileBtn">✏️ 编辑资料</button>' : '';
+      listEl.innerHTML = '<div class="profile-page">' +
+        '<div class="profile-banner" style="' + (profile.banner ? 'background-image:url(' + profile.banner + ')' : 'background:linear-gradient(135deg, #1e3a5f, #2c4a6e)') + ';">' +
+        '<div class="banner-overlay"></div>' + editBtn + '</div>' +
+        '<div class="profile-info">' +
+        '<div class="profile-avatar-large" style="' + (profile.avatar ? 'background-image:url(' + profile.avatar + ')' : '') + '">' + (profile.avatar ? '' : '🧑‍💻') + '</div>' +
+        '<div><div class="profile-name">' + escapeHtml(profile.name) + '</div>' +
+        '<div style="color:var(--text-secondary);font-size:0.85rem;">OIer / 算法竞赛选手</div></div></div>' +
+        '<div class="profile-bio">' + bioHtml + '</div>' +
+        '<div style="padding:0 2rem 2rem;">' +
+        '<button class="btn btn-secondary" id="backFromProfileBtn">← 返回首页</button></div></div>';
+      document.getElementById('backFromProfileBtn').addEventListener('click', loadPosts);
+      if (isAdmin) {
+        document.getElementById('editProfileBtn').addEventListener('click', showProfileEditor);
+      }
+    }
+
+    function showProfileEditor() {
+      var listEl = document.getElementById('postList');
+      listEl.innerHTML = '<div class="editor">' +
+        '<h2 style="margin-bottom:1rem;">✏️ 编辑个人资料</h2>' +
+        '<label>头像图片 URL</label>' +
+        '<input type="url" id="editAvatar" placeholder="https://example.com/avatar.png" value="' + escapeHtml(profile.avatar) + '">' +
+        '<label>背景图片 URL</label>' +
+        '<input type="url" id="editBanner" placeholder="https://example.com/banner.png" value="' + escapeHtml(profile.banner) + '">' +
+        '<label>昵称</label>' +
+        '<input type="text" id="editName" value="' + escapeHtml(profile.name) + '">' +
+        '<label>个人介绍</label>' +
+        '<textarea id="editBio" style="min-height:120px;">' + escapeHtml(profile.bio) + '</textarea>' +
+        '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
+        '<button class="btn" id="saveProfileBtn">💾 保存到云端</button>' +
+        '<button class="btn btn-secondary" id="cancelProfileEditBtn">取消</button></div></div>';
+      document.getElementById('saveProfileBtn').addEventListener('click', function() {
+        profile.avatar = document.getElementById('editAvatar').value.trim();
+        profile.banner = document.getElementById('editBanner').value.trim();
+        profile.name = document.getElementById('editName').value.trim() || 'Mirage_Rover';
+        profile.bio = document.getElementById('editBio').value.trim();
+        saveProfileToGitHub().then(function() {
+          updateSidebarProfile();
+          showProfile();
+        });
+      });
+      document.getElementById('cancelProfileEditBtn').addEventListener('click', showProfile);
+    }
+
+    // ==================== 文章加载 ====================
     async function loadPosts() {
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载中...</div>';
@@ -667,10 +724,9 @@
         });
       }
       if (searchQuery) {
-        var query = searchQuery.toLowerCase();
+        var q = searchQuery.toLowerCase();
         filteredPosts = filteredPosts.filter(function(issue) {
-          return issue.title.toLowerCase().includes(query) || 
-                 (issue.body && issue.body.toLowerCase().includes(query));
+          return issue.title.toLowerCase().includes(q) || (issue.body && issue.body.toLowerCase().includes(q));
         });
       }
       if (filteredPosts.length === 0) {
@@ -679,16 +735,13 @@
       }
       listEl.innerHTML = filteredPosts.map(function(issue) {
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
-        var tags = issue.labels
-          .filter(function(l) { return l.name !== LABEL_PREFIX; })
-          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; })
-          .join('');
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX; })
+          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
         return '<article class="post-card" data-issue="' + issue.number + '">' +
           '<div class="post-meta"><span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span></div>' +
           '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
           '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
-          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
-          '</article>';
+          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') + '</article>';
       }).join('');
       document.querySelectorAll('.post-card').forEach(function(card) {
         card.addEventListener('click', function(e) {
@@ -721,7 +774,7 @@
         return;
       }
       tagCloud.innerHTML = tagNames.map(function(tag) {
-        return '<span class="post-tag' + (activeTag === tag ? ' active' : '') + '" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#0d1117;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
+        return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#0d1117;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
       }).join('');
       tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
         tag.addEventListener('click', function() {
@@ -732,82 +785,14 @@
       });
     }
 
-    // ==================== 个人主页 ====================
-    function showProfile() {
-      var listEl = document.getElementById('postList');
-      var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
-      var editBtn = isAdmin ? '<button class="btn profile-edit-btn" id="editProfileBtn">✏️ 编辑资料</button>' : '';
-      
-      listEl.innerHTML = '<div class="profile-page">' +
-        '<div class="profile-banner" style="' + (profile.banner ? 'background-image:url(' + profile.banner + ')' : 'background:linear-gradient(135deg, #1e3a5f, #2c4a6e)') + ';">' +
-        '<div class="banner-overlay"></div>' +
-        editBtn +
-        '</div>' +
-        '<div class="profile-info">' +
-        '<div class="profile-avatar-large" style="' + (profile.avatar ? 'background-image:url(' + profile.avatar + ')' : '') + '">' + (profile.avatar ? '' : '🧑‍💻') + '</div>' +
-        '<div>' +
-        '<div class="profile-name">' + escapeHtml(profile.name) + '</div>' +
-        '<div style="color:var(--text-secondary);font-size:0.85rem;">OIer / 算法竞赛选手</div>' +
-        '</div>' +
-        '</div>' +
-        '<div class="profile-bio">' + bioHtml + '</div>' +
-        '<div style="padding:0 2rem 2rem;">' +
-        '<button class="btn btn-secondary" id="backFromProfileBtn">← 返回首页</button>' +
-        '</div>' +
-        '</div>';
-      
-      document.getElementById('backFromProfileBtn').addEventListener('click', loadPosts);
-      if (isAdmin) {
-        document.getElementById('editProfileBtn').addEventListener('click', showProfileEditor);
-      }
-    }
-
-    function showProfileEditor() {
-      var listEl = document.getElementById('postList');
-      listEl.innerHTML = '<div class="editor">' +
-        '<h2 style="margin-bottom:1rem;">✏️ 编辑个人资料</h2>' +
-        '<label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;">头像图片 URL</label>' +
-        '<input type="url" id="editAvatar" placeholder="https://example.com/avatar.png" value="' + escapeHtml(profile.avatar) + '">' +
-        '<label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;">背景图片 URL</label>' +
-        '<input type="url" id="editBanner" placeholder="https://example.com/banner.png" value="' + escapeHtml(profile.banner) + '">' +
-        '<label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;">昵称</label>' +
-        '<input type="text" id="editName" placeholder="您的昵称" value="' + escapeHtml(profile.name) + '">' +
-        '<label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.3rem;">个人介绍</label>' +
-        '<textarea id="editBio" placeholder="介绍一下自己..." style="min-height:120px;">' + escapeHtml(profile.bio) + '</textarea>' +
-        '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
-        '<button class="btn" id="saveProfileBtn">💾 保存</button>' +
-        '<button class="btn btn-secondary" id="cancelProfileEditBtn">取消</button>' +
-        '</div></div>';
-      
-      document.getElementById('saveProfileBtn').addEventListener('click', function() {
-        profile.avatar = document.getElementById('editAvatar').value.trim();
-        profile.banner = document.getElementById('editBanner').value.trim();
-        profile.name = document.getElementById('editName').value.trim() || 'Mirage_Rover';
-        profile.bio = document.getElementById('editBio').value.trim() || 'OIer / 算法竞赛选手';
-        
-        localStorage.setItem('profile_avatar', profile.avatar);
-        localStorage.setItem('profile_banner', profile.banner);
-        localStorage.setItem('profile_name', profile.name);
-        localStorage.setItem('profile_bio', profile.bio);
-        
-        updateSidebarProfile();
-        showProfile();
-        showMessage('success', '个人资料已更新');
-      });
-      
-      document.getElementById('cancelProfileEditBtn').addEventListener('click', showProfile);
-    }
-
     async function showPost(issueNumber) {
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">加载文章...</div>';
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         var content = renderMarkdown(issue.body || '');
-        var tags = issue.labels
-          .filter(function(l) { return l.name !== LABEL_PREFIX; })
-          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; })
-          .join(' ');
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX; })
+          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
         var adminButtons = isAdmin ? 
           '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
           '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
@@ -817,10 +802,8 @@
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
           '<div class="post-meta" style="margin-bottom:1rem;">' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
-          (tags ? '<span style="display:flex;gap:0.5rem;flex-wrap:wrap;">' + tags + '</span>' : '') +
-          '</div>' +
-          '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
-          adminButtons + '</div>';
+          (tags ? '<span style="display:flex;gap:0.5rem;">' + tags + '</span>' : '') + '</div>' +
+          '<div class="markdown-body" id="markdownContent">' + content + '</div>' + adminButtons + '</div>';
         document.getElementById('backBtn').addEventListener('click', loadPosts);
         if (isAdmin) {
           document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
@@ -839,20 +822,15 @@
       document.getElementById('passwordInput').value = '';
       document.getElementById('passwordInput').focus();
     }
-    function hidePasswordModal() {
-      document.getElementById('passwordModal').classList.remove('active');
-    }
+    function hidePasswordModal() { document.getElementById('passwordModal').classList.remove('active'); }
     function verifyPassword() {
-      var input = document.getElementById('passwordInput').value;
-      if (input === ADMIN_PASSWORD) {
+      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
         isAdmin = true;
         hidePasswordModal();
         showMessage('success', '管理员验证成功');
         document.getElementById('adminBtn').textContent = '✏️ 写文章';
         loadPosts();
-      } else {
-        showMessage('error', '密码错误');
-      }
+      } else { showMessage('error', '密码错误'); }
     }
 
     function showEditor(issueNumber, existingData) {
@@ -865,14 +843,11 @@
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
         '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
-        '<div class="tag-input-row">' +
-        '<input type="text" id="tagInput" placeholder="添加标签（回车确认）">' +
-        '<button class="btn btn-secondary" id="addTagBtn">添加</button>' +
-        '</div>' +
+        '<div class="tag-input-row"><input type="text" id="tagInput" placeholder="添加标签"><button class="btn btn-secondary" id="addTagBtn">添加</button></div>' +
         '<div class="tag-list" id="tagList"></div>' +
         '<textarea id="editContent" placeholder="支持 Markdown 和 LaTeX 公式">' + contentValue + '</textarea>' +
         '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
-        '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存修改' : '📤 发布') + '</button>' +
+        '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存' : '📤 发布') + '</button>' +
         '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
       var currentTags = existingTags.slice();
       function renderTags() {
@@ -882,8 +857,7 @@
         }).join('');
         tagList.querySelectorAll('.remove-tag').forEach(function(btn) {
           btn.addEventListener('click', function() {
-            var tagToRemove = this.getAttribute('data-tag');
-            currentTags = currentTags.filter(function(t) { return t !== tagToRemove; });
+            currentTags = currentTags.filter(function(t) { return t !== this.getAttribute('data-tag'); }.bind(this));
             renderTags();
           });
         });
@@ -892,17 +866,11 @@
       function addTag() {
         var tagInput = document.getElementById('tagInput');
         var tag = tagInput.value.trim();
-        if (tag && currentTags.indexOf(tag) === -1) {
-          currentTags.push(tag);
-          renderTags();
-        }
-        tagInput.value = '';
-        tagInput.focus();
+        if (tag && currentTags.indexOf(tag) === -1) { currentTags.push(tag); renderTags(); }
+        tagInput.value = ''; tagInput.focus();
       }
       document.getElementById('addTagBtn').addEventListener('click', addTag);
-      document.getElementById('tagInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); addTag(); }
-      });
+      document.getElementById('tagInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
       document.getElementById('saveBtn').addEventListener('click', function() {
         var title = document.getElementById('editTitle').value.trim();
         var content = document.getElementById('editContent').value.trim();
@@ -910,92 +878,47 @@
         var labels = [LABEL_PREFIX].concat(currentTags);
         if (isEdit) { updatePost(issueNumber, title, content, labels); } else { publishPost(title, content, labels); }
       });
-      document.getElementById('cancelEditBtn').addEventListener('click', function() {
-        if (isEdit) { showPost(issueNumber); } else { loadPosts(); }
-      });
+      document.getElementById('cancelEditBtn').addEventListener('click', function() { if (isEdit) { showPost(issueNumber); } else { loadPosts(); } });
     }
 
     async function editPost(issueNumber) {
-      try {
-        var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
-        showEditor(issueNumber, issue);
-      } catch (error) {
-        showMessage('error', error.message);
-      }
+      try { var issue = await proxyRequest('GET', '/api/issues/' + issueNumber); showEditor(issueNumber, issue); }
+      catch (error) { showMessage('error', error.message); }
     }
     async function publishPost(title, content, labels) {
-      try {
-        await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true);
-        showMessage('success', '文章发布成功！');
-        loadPosts();
-      } catch (error) {
-        showMessage('error', '发布失败: ' + error.message);
-      }
+      try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showMessage('success', '文章发布成功！'); loadPosts(); }
+      catch (error) { showMessage('error', '发布失败: ' + error.message); }
     }
     async function updatePost(issueNumber, title, content, labels) {
-      try {
-        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true);
-        showMessage('success', '文章已更新');
-        showPost(issueNumber);
-      } catch (error) {
-        showMessage('error', '更新失败: ' + error.message);
-      }
+      try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showMessage('success', '文章已更新'); showPost(issueNumber); }
+      catch (error) { showMessage('error', '更新失败: ' + error.message); }
     }
     async function deletePost(issueNumber, issueTitle) {
       if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return;
       var listEl = document.getElementById('postList');
       listEl.innerHTML = '<div class="loading">正在删除...</div>';
-      try {
-        await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true);
-        showMessage('success', '文章已删除');
-        loadPosts();
-      } catch (error) {
-        showMessage('error', '删除失败: ' + error.message);
-        loadPosts();
-      }
+      try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showMessage('success', '文章已删除'); loadPosts(); }
+      catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); }
     }
 
+    // ==================== 初始化 ====================
     window.addEventListener('DOMContentLoaded', function() {
       updateSidebarProfile();
-      
-      document.getElementById('logoBtn').addEventListener('click', function() {
-        activeTag = null;
-        searchQuery = '';
-        document.getElementById('searchInput').value = '';
-        loadPosts();
-      });
-      document.getElementById('homeBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        activeTag = null;
-        searchQuery = '';
-        document.getElementById('searchInput').value = '';
-        loadPosts();
-      });
-      document.getElementById('adminBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
-      });
+      document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
+      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
+      document.getElementById('adminBtn').addEventListener('click', function(e) { e.preventDefault(); if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); } });
       document.getElementById('passwordConfirmBtn').addEventListener('click', verifyPassword);
       document.getElementById('passwordCancelBtn').addEventListener('click', hidePasswordModal);
-      document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') verifyPassword();
-      });
-      document.getElementById('searchInput').addEventListener('input', function() {
-        searchQuery = this.value.trim();
-        renderPosts();
-      });
+      document.getElementById('passwordInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') verifyPassword(); });
+      document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); renderPosts(); });
       document.getElementById('changelogToggle').addEventListener('click', function() {
         var content = document.getElementById('changelogContent');
         var arrow = this.querySelector('.arrow');
         content.classList.toggle('collapsed');
         arrow.classList.toggle('collapsed');
       });
-      
-      // 点击头像进入个人主页
-      document.getElementById('profileCard').addEventListener('click', function() {
-        showProfile();
-      });
-      
+      document.getElementById('profileCard').addEventListener('click', showProfile);
+      loadProfile();
       loadPosts();
     });
   </script>
