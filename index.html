@@ -301,12 +301,7 @@
       padding: 1rem;
       box-shadow: var(--shadow);
     }
-    #sidebarTOC .toc-title {
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-      color: var(--accent);
-    }
+    #sidebarTOC .toc-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
     #sidebarTOC .toc-item {
       display: block;
       color: var(--text-secondary);
@@ -332,9 +327,7 @@
     }
     .post-detail h1 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--text); }
     .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; color: var(--text); }
-    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-      scroll-margin-top: 80px;
-    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 { scroll-margin-top: 80px; }
     .markdown-body pre {
       background: var(--code-bg);
       padding: 1.2rem;
@@ -369,10 +362,7 @@
       padding: 0 4px;
     }
 
-    .code-block-wrapper {
-      position: relative;
-      margin: 1rem 0;
-    }
+    .code-block-wrapper { position: relative; margin: 1rem 0; }
     .copy-code-btn {
       position: absolute;
       top: 0.5rem;
@@ -389,11 +379,7 @@
       opacity: 0;
     }
     .code-block-wrapper:hover .copy-code-btn { opacity: 1; }
-    .copy-code-btn:hover {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
-    }
+    .copy-code-btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
 
     .pagination {
       display: flex;
@@ -402,12 +388,7 @@
       margin-top: 1.5rem;
       flex-wrap: wrap;
     }
-    .pagination .btn {
-      padding: 0.5rem 0.9rem;
-      font-size: 0.85rem;
-      min-width: 36px;
-      text-align: center;
-    }
+    .pagination .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; min-width: 36px; text-align: center; }
 
     .search-box {
       display: flex;
@@ -454,14 +435,7 @@
     }
     .editor label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; margin-top: 0.8rem; }
     .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: var(--accent); }
-    .editor select {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.6rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
+    .editor select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: 8px; font-size: 0.9rem; }
 
     .tag-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
     .tag-input-row input { flex: 1; min-width: 150px; margin-bottom: 0 !important; }
@@ -486,12 +460,7 @@
       overflow: hidden;
       animation: fadeInUp 0.5s ease;
     }
-    .profile-banner {
-      height: 200px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
+    .profile-banner { height: 200px; background-size: cover; background-position: center; position: relative; }
     .profile-banner .banner-overlay {
       position: absolute;
       bottom: 0;
@@ -525,12 +494,51 @@
     }
     .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--text); }
     .profile-bio { color: var(--text-secondary); font-size: 0.95rem; padding: 1rem 2rem 2rem; }
-    .profile-edit-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      z-index: 10;
+    .profile-edit-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; }
+
+    /* 评论区 */
+    .comments-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
     }
+    .comments-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
+    .comment-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+    }
+    .comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .comment-author { font-weight: 600; font-size: 0.85rem; }
+    .comment-date { font-size: 0.75rem; color: var(--text-secondary); }
+    .comment-body { font-size: 0.9rem; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+    .comment-input-area { margin-top: 1rem; }
+    .comment-input-area textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      min-height: 80px;
+      resize: vertical;
+    }
+    .comment-input-area textarea:focus { outline: none; border-color: var(--accent); }
 
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
     .error-msg { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
@@ -620,18 +628,19 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
+              <div class="changelog-version">v1.0.6</div>
+              <div class="changelog-date">2026-08-21</div>
+              <div class="changelog-desc">
+                ✨ 新增评论系统<br>
+                💬 使用 GitHub Issues 评论
+              </div>
+            </div>
+            <div class="changelog-item">
               <div class="changelog-version">v1.0.5</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 云端浏览量统计<br>
                 📝 代码块计入字数
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.0.4</div>
-              <div class="changelog-date">2026-08-21</div>
-              <div class="changelog-desc">
-                ✨ 新增文章统计
               </div>
             </div>
             <div class="changelog-item">
@@ -671,6 +680,8 @@
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
     const PROFILE_LABEL = 'profile-data';
+    const GITHUB_OWNER = 'User-dusttle';
+    const GITHUB_REPO = 'Blog';
     
     let isAdmin = false;
     let allPosts = [];
@@ -830,9 +841,7 @@
     function getWeightFromLabels(labels) {
       if (!labels) return 2;
       for (var i = 0; i < labels.length; i++) {
-        if (labels[i].name && labels[i].name.startsWith('weight:')) {
-          return parseInt(labels[i].name.replace('weight:', '')) || 2;
-        }
+        if (labels[i].name && labels[i].name.startsWith('weight:')) return parseInt(labels[i].name.replace('weight:', '')) || 2;
       }
       return 2;
     }
@@ -840,9 +849,7 @@
     function getViewCountFromLabels(labels) {
       if (!labels) return 0;
       for (var i = 0; i < labels.length; i++) {
-        if (labels[i].name && labels[i].name.startsWith('views:')) {
-          return parseInt(labels[i].name.replace('views:', '')) || 0;
-        }
+        if (labels[i].name && labels[i].name.startsWith('views:')) return parseInt(labels[i].name.replace('views:', '')) || 0;
       }
       return 0;
     }
@@ -864,29 +871,47 @@
     async function incrementViewCount(issue) {
       var currentViews = getViewCountFromLabels(issue.labels);
       var newViews = currentViews + 1;
-      var newLabels = issue.labels
-        .filter(function(l) { return !l.name.startsWith('views:'); })
-        .map(function(l) { return l.name; });
+      var newLabels = issue.labels.filter(function(l) { return !l.name.startsWith('views:'); }).map(function(l) { return l.name; });
       newLabels.push('views:' + newViews);
-      try {
-        await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels });
-      } catch (e) {
-        console.log('更新浏览量失败:', e);
-      }
+      try { await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels }); } catch (e) { console.log('更新浏览量失败:', e); }
       return newViews;
+    }
+
+    // ==================== 评论区 ====================
+    async function loadComments(issueNumber) {
+      try { return await proxyRequest('GET', '/api/issues/' + issueNumber + '/comments'); }
+      catch (error) { console.log('加载评论失败:', error); return []; }
+    }
+
+    async function postComment(issueNumber, content) {
+      try { await proxyRequest('POST', '/api/issues/' + issueNumber + '/comments', { body: content }); return true; }
+      catch (error) { showMessage('error', '评论失败: ' + error.message); return false; }
+    }
+
+    function renderComments(comments) {
+      if (!comments || comments.length === 0) {
+        return '<div style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:1rem;">暂无评论，来抢沙发~</div>';
+      }
+      return comments.map(function(comment) {
+        var avatar = comment.user && comment.user.avatar_url ? comment.user.avatar_url : '';
+        var login = comment.user ? comment.user.login : '匿名';
+        return '<div class="comment-item">' +
+          '<div class="comment-header">' +
+          '<div class="comment-avatar" style="' + (avatar ? 'background-image:url(' + avatar + ')' : '') + '">' + (avatar ? '' : '👤') + '</div>' +
+          '<span class="comment-author">' + escapeHtml(login) + '</span>' +
+          '<span class="comment-date">' + new Date(comment.created_at).toLocaleDateString('zh-CN') + '</span>' +
+          '</div>' +
+          '<div class="comment-body">' + escapeHtml(comment.body || '') + '</div>' +
+          '</div>';
+      }).join('');
     }
 
     function updateSidebarProfile() {
       var avatarEl = document.getElementById('sidebarAvatar');
       var nameEl = document.getElementById('sidebarName');
       var bioEl = document.getElementById('sidebarBio');
-      if (profile.avatar) {
-        avatarEl.style.backgroundImage = 'url(' + profile.avatar + ')';
-        avatarEl.textContent = '';
-      } else {
-        avatarEl.style.backgroundImage = '';
-        avatarEl.textContent = '🧑‍💻';
-      }
+      if (profile.avatar) { avatarEl.style.backgroundImage = 'url(' + profile.avatar + ')'; avatarEl.textContent = ''; }
+      else { avatarEl.style.backgroundImage = ''; avatarEl.textContent = '🧑‍💻'; }
       nameEl.textContent = profile.name;
       bioEl.innerHTML = escapeHtml(profile.bio).replace(/\n/g, '<br>');
     }
@@ -910,10 +935,7 @@
         var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
         var profileIssue = null;
         for (var i = 0; i < issues.length; i++) {
-          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) {
-            profileIssue = issues[i];
-            break;
-          }
+          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) { profileIssue = issues[i]; break; }
         }
         if (profileIssue && profileIssue.body) {
           try { var parsed = JSON.parse(profileIssue.body); if (parsed && typeof parsed === 'object') profile = parsed; } catch (e) {}
@@ -986,9 +1008,7 @@
       listEl.innerHTML = '<div class="loading">加载中...</div>';
       try {
         var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
-        allPosts = issues.filter(function(issue) {
-          return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; });
-        });
+        allPosts = issues.filter(function(issue) { return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; }); });
         allPosts.sort(function(a, b) {
           var wa = getWeightFromLabels(a.labels);
           var wb = getWeightFromLabels(b.labels);
@@ -1088,6 +1108,10 @@
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
         var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
         var adminButtons = isAdmin ? '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' + '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' + '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
+        
+        // 加载评论
+        var comments = await loadComments(issueNumber);
+        
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
@@ -1100,12 +1124,43 @@
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
-          adminButtons + '</div>';
+          adminButtons +
+          '<div class="comments-section">' +
+          '<div class="comments-title">💬 评论 (' + comments.length + ')</div>' +
+          '<div id="commentsList">' + renderComments(comments) + '</div>' +
+          '<div class="comment-input-area">' +
+          '<textarea id="commentInput" placeholder="发表评论..."></textarea>' +
+          '<div style="margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">' +
+          '<button class="btn" id="submitCommentBtn">💬 发表评论</button>' +
+          '<a href="https://github.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/issues/' + issueNumber + '" target="_blank" style="font-size:0.8rem;color:var(--accent);text-decoration:none;">在 GitHub 上查看</a>' +
+          '</div></div></div></div>';
+        
         document.getElementById('backBtn').addEventListener('click', function() { loadPosts(); });
         if (isAdmin) {
           document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
           document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
         }
+        
+        // 绑定评论提交
+        document.getElementById('submitCommentBtn').addEventListener('click', function() {
+          var commentInput = document.getElementById('commentInput');
+          var content = commentInput.value.trim();
+          if (!content) { showMessage('error', '请输入评论内容'); return; }
+          if (content.length < 2) { showMessage('error', '评论太短了'); return; }
+          if (content.length > 500) { showMessage('error', '评论太长（最多500字）'); return; }
+          postComment(issueNumber, content).then(function(success) {
+            if (success) {
+              commentInput.value = '';
+              showMessage('success', '评论发表成功！');
+              loadComments(issueNumber).then(function(newComments) {
+                document.getElementById('commentsList').innerHTML = renderComments(newComments);
+                var commentsTitle = document.querySelector('.comments-title');
+                if (commentsTitle) commentsTitle.textContent = '💬 评论 (' + newComments.length + ')';
+              });
+            }
+          });
+        });
+        
         if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) { MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {}); }
       } catch (error) { listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>'; }
     }
