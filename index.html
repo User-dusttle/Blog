@@ -113,6 +113,41 @@
     }
     .reading-progress-percentage.visible { opacity: 1; }
 
+    /* 右侧滑入弹窗 */
+    .toast-notification {
+      position: fixed;
+      top: 20px;
+      right: -400px;
+      z-index: 10002;
+      background: var(--surface);
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+      opacity: 1;
+      max-width: 350px;
+    }
+    .toast-notification.show {
+      right: 20px;
+    }
+    .toast-notification.fade-out {
+      opacity: 0;
+    }
+    .toast-notification .toast-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+    .toast-notification .toast-content {
+      display: flex;
+      align-items: center;
+    }
+    .toast-notification .toast-message {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--success-text);
+    }
+
     .blog-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -592,6 +627,15 @@
     }
     .comment-input-area textarea:focus { outline: none; border-color: var(--accent); }
 
+    .password-error {
+      color: var(--error-text);
+      font-size: 0.75rem;
+      margin-top: -0.5rem;
+      margin-bottom: 0.5rem;
+      display: none;
+    }
+    .password-error.visible { display: block; }
+
     .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
     .error-msg { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     .success-msg { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
@@ -649,6 +693,13 @@
     <div class="reading-progress-bar" id="readingProgressBar"></div>
   </div>
   <div class="reading-progress-percentage" id="readingProgressPercentage">0%</div>
+  
+  <div class="toast-notification" id="toastNotification">
+    <div class="toast-content">
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">管理员验证成功</span>
+    </div>
+  </div>
 
   <div class="blog-container">
     <header class="site-header">
@@ -689,40 +740,28 @@
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 快捷键改用 Alt 组合键<br>
-                📂 快捷键栏可折叠
+                📂 快捷键栏可折叠<br>
+                🔔 登录成功弹窗<br>
+                📝 错误提示优化
               </div>
             </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.1.0</div>
-              <div class="changelog-date">2026-08-21</div>
-              <div class="changelog-desc">
-                ✨ 新增阅读进度条
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.0.0</div>
-              <div class="changelog-date">2026-08-20</div>
-              <div class="changelog-desc">
-                ✨ 初始版本发布
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="sidebar-card">
-          <h3 id="shortcutToggle"><span class="arrow" id="shortcutArrow">▼</span> ⌨️ 快捷键</h3>
-          <div class="shortcut-content" id="shortcutContent">
-            <div class="shortcut-row"><span>🔍 搜索</span><kbd>Alt+K</kbd></div>
-            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Alt+T</kbd></div>
-            <div class="shortcut-row"><span>🏠 首页</span><kbd>Alt+H</kbd></div>
-            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Alt+P</kbd></div>
-            <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Alt+N</kbd></div>
-            <div class="shortcut-row"><span>❌ 关闭/返回</span><kbd>Esc</kbd></div>
           </div>
         </div>
         <div class="sidebar-card">
           <h3>🏷️ 标签筛选</h3>
           <div class="tag-cloud" id="tagCloud">
             <span class="loading" style="padding:1rem;">加载标签...</span>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3 id="shortcutToggle"><span class="arrow collapsed" id="shortcutArrow">▼</span> ⌨️ 快捷键</h3>
+          <div class="shortcut-content collapsed" id="shortcutContent">
+            <div class="shortcut-row"><span>🔍 搜索</span><kbd>Alt+K</kbd></div>
+            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Alt+T</kbd></div>
+            <div class="shortcut-row"><span>🏠 首页</span><kbd>Alt+H</kbd></div>
+            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Alt+P</kbd></div>
+            <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Alt+N</kbd></div>
+            <div class="shortcut-row"><span>❌ 关闭/返回</span><kbd>Esc</kbd></div>
           </div>
         </div>
       </aside>
@@ -735,6 +774,7 @@
     <div class="password-box">
       <h2>🔐 管理员验证</h2>
       <input type="password" id="passwordInput" placeholder="管理密码">
+      <div class="password-error" id="passwordError">密码错误，请重试</div>
       <div style="display: flex; gap: 0.5rem;">
         <button class="btn" id="passwordConfirmBtn">确认</button>
         <button class="btn btn-secondary" id="passwordCancelBtn">取消</button>
@@ -763,6 +803,24 @@
       bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记',
       name: 'Mirage_Rover'
     };
+
+    // ==================== 右侧弹窗通知 ====================
+    function showToast(message, icon) {
+      var toast = document.getElementById('toastNotification');
+      var toastMessage = toast.querySelector('.toast-message');
+      var toastIcon = toast.querySelector('.toast-icon');
+      toastMessage.textContent = message;
+      toastIcon.textContent = icon || '✅';
+      toast.classList.remove('fade-out');
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.add('fade-out');
+        setTimeout(function() {
+          toast.classList.remove('show');
+          toast.classList.remove('fade-out');
+        }, 500);
+      }, 2500);
+    }
 
     function updateReadingProgress() {
       var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -1058,7 +1116,7 @@
         var body = JSON.stringify(profile);
         if (profileIssue) { await proxyRequest('PATCH', '/admin/issues/' + profileIssue.number, { body: body }, true); }
         else { await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true); }
-        showMessage('success', '个人资料已保存');
+        showToast('个人资料已保存', '✅');
       } catch (error) { showMessage('error', '保存失败: ' + error.message); }
     }
 
@@ -1256,7 +1314,7 @@
             postComment(issueNumber, content).then(function(success) {
               if (success) {
                 commentInput.value = '';
-                showMessage('success', '评论发表成功！');
+                showToast('评论发表成功！', '💬');
                 loadComments(issueNumber).then(function(newComments) {
                   document.getElementById('commentsList').innerHTML = renderComments(newComments);
                   var commentsTitle = document.querySelector('.comments-title');
@@ -1274,11 +1332,25 @@
       } catch (error) { listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>'; }
     }
 
-    function showPasswordModal() { document.getElementById('passwordModal').classList.add('active'); document.getElementById('passwordInput').value = ''; document.getElementById('passwordInput').focus(); }
+    function showPasswordModal() { 
+      document.getElementById('passwordModal').classList.add('active'); 
+      document.getElementById('passwordInput').value = ''; 
+      document.getElementById('passwordError').classList.remove('visible');
+      document.getElementById('passwordInput').focus(); 
+    }
     function hidePasswordModal() { document.getElementById('passwordModal').classList.remove('active'); }
     function verifyPassword() {
-      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) { isAdmin = true; hidePasswordModal(); showMessage('success', '管理员验证成功'); document.getElementById('adminBtn').textContent = '✏️ 写文章'; loadPosts(); }
-      else { showMessage('error', '密码错误'); }
+      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) { 
+        isAdmin = true; 
+        hidePasswordModal(); 
+        showToast('管理员验证成功', '✅');
+        document.getElementById('adminBtn').textContent = '✏️ 写文章'; 
+        loadPosts(); 
+      } else { 
+        document.getElementById('passwordError').classList.add('visible');
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
     }
 
     function showEditor(issueNumber, existingData) {
@@ -1332,9 +1404,9 @@
     }
 
     async function editPost(issueNumber) { try { var issue = await proxyRequest('GET', '/api/issues/' + issueNumber); showEditor(issueNumber, issue); } catch (error) { showMessage('error', error.message); } }
-    async function publishPost(title, content, labels) { try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showMessage('success', '文章发布成功！'); loadPosts(); } catch (error) { showMessage('error', '发布失败: ' + error.message); } }
-    async function updatePost(issueNumber, title, content, labels) { try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showMessage('success', '文章已更新'); showPost(issueNumber); } catch (error) { showMessage('error', '更新失败: ' + error.message); } }
-    async function deletePost(issueNumber, issueTitle) { if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return; var listEl = document.getElementById('postList'); listEl.innerHTML = '<div class="loading">正在删除...</div>'; try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showMessage('success', '文章已删除'); loadPosts(); } catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); } }
+    async function publishPost(title, content, labels) { try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showToast('文章发布成功！', '📤'); loadPosts(); } catch (error) { showMessage('error', '发布失败: ' + error.message); } }
+    async function updatePost(issueNumber, title, content, labels) { try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showToast('文章已更新', '💾'); showPost(issueNumber); } catch (error) { showMessage('error', '更新失败: ' + error.message); } }
+    async function deletePost(issueNumber, issueTitle) { if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return; var listEl = document.getElementById('postList'); listEl.innerHTML = '<div class="loading">正在删除...</div>'; try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showToast('文章已删除', '🗑️'); loadPosts(); } catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); } }
 
     window.addEventListener('DOMContentLoaded', function() {
       initTheme();
@@ -1346,26 +1418,19 @@
       if (oauthToken) {
         localStorage.setItem('github_oauth_token', oauthToken);
         window.history.replaceState({}, document.title, window.location.pathname);
-        showMessage('success', 'GitHub 登录成功！');
+        showToast('GitHub 登录成功！', '🔑');
       }
       
-      // ==================== 快捷键（Alt 组合键，不与浏览器冲突） ====================
+      // ==================== 快捷键（Alt 组合键） ====================
       document.addEventListener('keydown', function(e) {
-        // Alt+K - 聚焦搜索框
         if (e.altKey && (e.key === 'k' || e.key === 'K')) {
           e.preventDefault();
           document.getElementById('searchInput').focus();
-          showMessage('success', '🔍 搜索模式');
         }
-        
-        // Alt+T - 切换主题
         if (e.altKey && (e.key === 't' || e.key === 'T')) {
           e.preventDefault();
           toggleTheme();
-          showMessage('success', '主题已切换');
         }
-        
-        // Alt+H - 回到首页
         if (e.altKey && (e.key === 'h' || e.key === 'H')) {
           e.preventDefault();
           activeTag = null;
@@ -1374,20 +1439,14 @@
           document.getElementById('searchInput').value = '';
           loadPosts();
         }
-        
-        // Alt+P - 查看个人主页
         if (e.altKey && (e.key === 'p' || e.key === 'P')) {
           e.preventDefault();
           showProfile();
         }
-        
-        // Alt+N - 写新文章（管理员）
         if (e.altKey && (e.key === 'n' || e.key === 'N')) {
           e.preventDefault();
           if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
         }
-        
-        // Esc - 关闭弹窗或返回
         if (e.key === 'Escape') {
           var passwordModal = document.getElementById('passwordModal');
           if (passwordModal.classList.contains('active')) { hidePasswordModal(); }
