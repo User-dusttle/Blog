@@ -315,6 +315,81 @@
       padding: 0 4px;
     }
 
+    /* 代码复制按钮 */
+    .code-block-wrapper {
+      position: relative;
+      margin: 1rem 0;
+    }
+    .copy-code-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      opacity: 0;
+    }
+    .code-block-wrapper:hover .copy-code-btn {
+      opacity: 1;
+    }
+    .copy-code-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .pagination .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      min-width: 36px;
+      text-align: center;
+    }
+    .pagination .btn:not(.btn-secondary) {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    /* TOC */
+    .toc-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .toc-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      color: var(--accent);
+    }
+    .toc-item {
+      display: block;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.3rem 0;
+      border-bottom: none;
+      transition: color 0.3s ease;
+    }
+    .toc-item:hover {
+      color: var(--accent);
+    }
+
     .search-box {
       display: flex;
       align-items: center;
@@ -485,6 +560,7 @@
       .post-title { font-size: 1.3rem; }
       .search-box input { width: 80px; }
       .profile-info { flex-direction: column; align-items: center; text-align: center; }
+      .copy-code-btn { opacity: 1; }
     }
   </style>
 </head>
@@ -523,6 +599,15 @@
         <div class="sidebar-card">
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
+            <div class="changelog-item">
+              <div class="changelog-version">v1.0.2</div>
+              <div class="changelog-date">2026-08-21</div>
+              <div class="changelog-desc">
+                ✨ 新增代码复制按钮<br>
+                📄 新增分页功能<br>
+                📑 新增文章目录
+              </div>
+            </div>
             <div class="changelog-item">
               <div class="changelog-version">v1.0.1</div>
               <div class="changelog-date">2026-08-21</div>
@@ -570,6 +655,9 @@
     let allPosts = [];
     let activeTag = null;
     let searchQuery = '';
+    let currentPage = 1;
+    const perPage = 10;
+    let totalPages = 1;
     let profile = {
       avatar: '',
       banner: '',
@@ -640,10 +728,69 @@
             }
           } catch (e) { highlightedCode = escapeHtml(code); }
         } else { highlightedCode = escapeHtml(code); }
-        return '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>';
+        return '<div class="code-block-wrapper">' +
+          '<button class="copy-code-btn" onclick="copyCode(this)">📋 复制</button>' +
+          '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
+          '</div>';
       };
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
       return marked.parse(text);
+    }
+
+    function copyCode(btn) {
+      var codeBlock = btn.nextElementSibling.querySelector('code');
+      var code = codeBlock.textContent;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function() {
+          btn.textContent = '✅ 已复制';
+          setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+        }).catch(function() {
+          fallbackCopy(code, btn);
+        });
+      } else {
+        fallbackCopy(code, btn);
+      }
+    }
+
+    function fallbackCopy(code, btn) {
+      var textarea = document.createElement('textarea');
+      textarea.value = code;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      btn.textContent = '✅ 已复制';
+      setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+    }
+
+    function generateTOC(content) {
+      var headings = [];
+      var tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      var headingElements = tempDiv.querySelectorAll('h1, h2, h3');
+      headingElements.forEach(function(heading, index) {
+        heading.id = 'heading-' + index;
+        headings.push({
+          level: heading.tagName,
+          text: heading.textContent,
+          id: 'heading-' + index
+        });
+      });
+      return headings;
+    }
+
+    function renderTOC(headings) {
+      if (headings.length === 0) return '';
+      var tocHTML = '<div class="toc-container">';
+      tocHTML += '<div class="toc-title">📑 目录</div>';
+      headings.forEach(function(heading) {
+        var indent = heading.level === 'H1' ? 0 : heading.level === 'H2' ? 1 : 2;
+        tocHTML += '<a href="#' + heading.id + '" class="toc-item" style="padding-left:' + (indent * 20) + 'px;">' + escapeHtml(heading.text) + '</a>';
+      });
+      tocHTML += '</div>';
+      return tocHTML;
     }
 
     function getWeightFromLabels(labels) {
@@ -790,6 +937,7 @@
           if (wb !== wa) return wb - wa;
           return new Date(b.created_at) - new Date(a.created_at);
         });
+        currentPage = 1;
         renderPosts();
         renderTagCloud();
       } catch (error) {
@@ -811,11 +959,21 @@
           return issue.title.toLowerCase().includes(q) || (issue.body && issue.body.toLowerCase().includes(q));
         });
       }
+      
+      totalPages = Math.ceil(filteredPosts.length / perPage);
+      if (currentPage > totalPages) currentPage = 1;
+      if (currentPage < 1) currentPage = 1;
+      
       if (filteredPosts.length === 0) {
         listEl.innerHTML = '<div class="loading">暂无匹配文章</div>';
         return;
       }
-      listEl.innerHTML = filteredPosts.map(function(issue) {
+      
+      var startIndex = (currentPage - 1) * perPage;
+      var endIndex = Math.min(startIndex + perPage, filteredPosts.length);
+      var pagePosts = filteredPosts.slice(startIndex, endIndex);
+      
+      listEl.innerHTML = pagePosts.map(function(issue) {
         var weight = getWeightFromLabels(issue.labels);
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
         var tags = issue.labels
@@ -833,11 +991,18 @@
           (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
           '</article>';
       }).join('');
+      
+      // 分页控件
+      if (totalPages > 1) {
+        listEl.innerHTML += '<div class="pagination">' + renderPagination() + '</div>';
+      }
+      
       document.querySelectorAll('.post-card').forEach(function(card) {
         card.addEventListener('click', function(e) {
           if (e.target.classList.contains('post-tag')) {
             e.stopPropagation();
             activeTag = e.target.getAttribute('data-tag');
+            currentPage = 1;
             renderPosts();
             renderTagCloud();
           } else {
@@ -845,6 +1010,30 @@
           }
         });
       });
+    }
+
+    function renderPagination() {
+      var html = '';
+      if (currentPage > 1) {
+        html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage - 1) + ')">← 上一页</button>';
+      }
+      for (var i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          html += '<button class="btn" onclick="goToPage(' + i + ')">' + i + '</button>';
+        } else {
+          html += '<button class="btn btn-secondary" onclick="goToPage(' + i + ')">' + i + '</button>';
+        }
+      }
+      if (currentPage < totalPages) {
+        html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage + 1) + ')">下一页 →</button>';
+      }
+      return html;
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderPosts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderTagCloud() {
@@ -869,6 +1058,7 @@
       tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
         tag.addEventListener('click', function() {
           activeTag = this.getAttribute('data-tag');
+          currentPage = 1;
           renderPosts();
           renderTagCloud();
         });
@@ -880,7 +1070,10 @@
       listEl.innerHTML = '<div class="loading">加载文章...</div>';
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
-        var content = renderMarkdown(issue.body || '');
+        var rawContent = issue.body || '';
+        var content = renderMarkdown(rawContent);
+        var headings = generateTOC(content);
+        var tocHTML = renderTOC(headings);
         var weight = getWeightFromLabels(issue.labels);
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
         var tags = issue.labels
@@ -899,6 +1092,7 @@
           weightDisplay +
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
+          tocHTML +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
           adminButtons + '</div>';
         document.getElementById('backBtn').addEventListener('click', loadPosts);
@@ -1019,13 +1213,13 @@
       initTheme();
       updateSidebarProfile();
       document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
-      document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
-      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; document.getElementById('searchInput').value = ''; loadPosts(); });
+      document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
+      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
       document.getElementById('adminBtn').addEventListener('click', function(e) { e.preventDefault(); if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); } });
       document.getElementById('passwordConfirmBtn').addEventListener('click', verifyPassword);
       document.getElementById('passwordCancelBtn').addEventListener('click', hidePasswordModal);
       document.getElementById('passwordInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') verifyPassword(); });
-      document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); renderPosts(); });
+      document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); currentPage = 1; renderPosts(); });
       document.getElementById('changelogToggle').addEventListener('click', function() {
         var content = document.getElementById('changelogContent');
         var arrow = this.querySelector('.arrow');
