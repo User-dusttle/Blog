@@ -496,7 +496,6 @@
     .profile-bio { color: var(--text-secondary); font-size: 0.95rem; padding: 1rem 2rem 2rem; }
     .profile-edit-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; }
 
-    /* 评论区 */
     .comments-section {
       margin-top: 2rem;
       border-top: 1px solid var(--border);
@@ -854,7 +853,6 @@
       return 0;
     }
 
-    // 同一 IP（浏览器）不重复计数
     function hasViewed(issueNumber) {
       var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
       return !!viewedPosts[issueNumber];
@@ -883,7 +881,6 @@
     async function incrementViewCount(issue) {
       var currentViews = getViewCountFromLabels(issue.labels);
       
-      // 已经浏览过，直接返回
       if (hasViewed(issue.number)) {
         return currentViews;
       }
@@ -897,6 +894,18 @@
       try {
         await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels });
         markAsViewed(issue.number);
+        
+        // 更新本地数据
+        issue.labels = issue.labels.filter(function(l) { return !l.name.startsWith('views:'); });
+        issue.labels.push({ name: 'views:' + newViews });
+        
+        for (var i = 0; i < allPosts.length; i++) {
+          if (allPosts[i].number === issue.number) {
+            allPosts[i].labels = issue.labels;
+            break;
+          }
+        }
+        
         return newViews;
       } catch (e) {
         console.log('更新浏览量失败:', e);
@@ -904,7 +913,6 @@
       }
     }
 
-    // ==================== OAuth 登录 ====================
     function loginWithGitHub() {
       window.location.href = PROXY_URL + '/oauth/login';
     }
@@ -1303,7 +1311,6 @@
       initTheme();
       updateSidebarProfile();
       
-      // 检查 OAuth 回调
       var urlParams = new URLSearchParams(window.location.search);
       var oauthToken = urlParams.get('oauth_token');
       if (oauthToken) {
