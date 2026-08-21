@@ -80,7 +80,6 @@
       transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    /* 阅读进度条 */
     .reading-progress-container {
       position: fixed;
       top: 0;
@@ -112,9 +111,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    .reading-progress-percentage.visible {
-      opacity: 1;
-    }
+    .reading-progress-percentage.visible { opacity: 1; }
 
     .blog-container {
       max-width: 1200px;
@@ -318,6 +315,23 @@
     .changelog-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
 
     .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .shortcut-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .shortcut-row kbd {
+      background: var(--bg);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+    }
 
     #sidebarTOC {
       position: fixed;
@@ -629,7 +643,6 @@
   </style>
 </head>
 <body>
-  <!-- 阅读进度条 -->
   <div class="reading-progress-container">
     <div class="reading-progress-bar" id="readingProgressBar"></div>
   </div>
@@ -673,9 +686,19 @@
               <div class="changelog-version">v1.1.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                💬 OAuth评论系统<br>
-                ✨ 新增阅读进度条<br>
-                ✨ 深色/暗色模式
+                ✨ 新增快捷键<br>
+                ⌨️ Ctrl+K 搜索<br>
+                🌙 Ctrl+Shift+T 切换主题<br>
+                🏠 Ctrl+Home 首页<br>
+                👤 Ctrl+Shift+P 个人主页<br>
+                ✏️ Ctrl+N 新文章
+              </div>
+            </div>
+            <div class="changelog-item">
+              <div class="changelog-version">v1.0.9</div>
+              <div class="changelog-date">2026-08-21</div>
+              <div class="changelog-desc">
+                ✨ 新增阅读进度条
               </div>
             </div>
             <div class="changelog-item">
@@ -685,6 +708,17 @@
                 ✨ 初始版本发布
               </div>
             </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3>⌨️ 快捷键</h3>
+          <div>
+            <div class="shortcut-row"><span>🔍 搜索</span><kbd>Ctrl+K</kbd></div>
+            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Ctrl+Shift+T</kbd></div>
+            <div class="shortcut-row"><span>🏠 首页</span><kbd>Ctrl+Home</kbd></div>
+            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Ctrl+Shift+P</kbd></div>
+            <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Ctrl+N</kbd></div>
+            <div class="shortcut-row"><span>❌ 关闭/返回</span><kbd>Esc</kbd></div>
           </div>
         </div>
         <div class="sidebar-card">
@@ -732,7 +766,6 @@
       name: 'Mirage_Rover'
     };
 
-    // ==================== 阅读进度条 ====================
     function updateReadingProgress() {
       var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -742,11 +775,7 @@
       if (bar) bar.style.width = progress + '%';
       if (percentage) {
         percentage.textContent = Math.round(progress) + '%';
-        if (scrollTop > 100) {
-          percentage.classList.add('visible');
-        } else {
-          percentage.classList.remove('visible');
-        }
+        if (scrollTop > 100) { percentage.classList.add('visible'); } else { percentage.classList.remove('visible'); }
       }
     }
 
@@ -1321,6 +1350,53 @@
         window.history.replaceState({}, document.title, window.location.pathname);
         showMessage('success', 'GitHub 登录成功！');
       }
+      
+      // ==================== 快捷键 ====================
+      document.addEventListener('keydown', function(e) {
+        // Ctrl+K / Cmd+K - 聚焦搜索框
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          document.getElementById('searchInput').focus();
+          showMessage('success', '🔍 搜索模式');
+        }
+        
+        // Ctrl+Shift+T - 切换主题
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+          e.preventDefault();
+          toggleTheme();
+          showMessage('success', '主题已切换');
+        }
+        
+        // Ctrl+Home - 回到首页
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Home') {
+          e.preventDefault();
+          activeTag = null;
+          searchQuery = '';
+          currentPage = 1;
+          document.getElementById('searchInput').value = '';
+          loadPosts();
+        }
+        
+        // Ctrl+N / Cmd+N - 写新文章（管理员）
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+          e.preventDefault();
+          if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
+        }
+        
+        // Ctrl+Shift+P - 查看个人主页
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+          e.preventDefault();
+          showProfile();
+        }
+        
+        // Esc - 关闭弹窗或返回
+        if (e.key === 'Escape') {
+          var passwordModal = document.getElementById('passwordModal');
+          if (passwordModal.classList.contains('active')) { hidePasswordModal(); }
+          var backBtn = document.getElementById('backBtn');
+          if (backBtn) { loadPosts(); }
+        }
+      });
       
       document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
       document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
