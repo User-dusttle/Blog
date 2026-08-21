@@ -43,6 +43,8 @@
       --banner-gradient: linear-gradient(135deg, #1e3a5f, #2c4a6e);
       --gold: #d4a574;
       --gold-soft: #3a2f1e;
+      --link-color: #7cb8ff;
+      --link-hover: #a8d0ff;
     }
 
     :root[data-theme="light"] {
@@ -59,7 +61,6 @@
       --code-bg: #f7fafc;
       --radius: 16px;
       --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --modal-overlay: rgba(0, 0, 0, 0.4);
       --error-bg: #fed7d7;
       --error-border: #feb2b2;
@@ -70,6 +71,8 @@
       --banner-gradient: linear-gradient(135deg, #bee3f8, #90cdf4);
       --gold: #b8860b;
       --gold-soft: #fef3c7;
+      --link-color: #2b6cb0;
+      --link-hover: #2c5282;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -117,7 +120,6 @@
     }
     .reading-progress-percentage.visible { opacity: 1; }
 
-    /* 回到顶部按钮 */
     .back-to-top {
       position: fixed;
       bottom: 30px;
@@ -349,38 +351,85 @@
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* 代码块语言标签 */
-    .code-block-wrapper { position: relative; margin: 1rem 0; }
+    /* 优化代码块语言标签 —— 置于左上角且半透明背景，不遮挡代码 */
+    .code-block-wrapper {
+      position: relative;
+      margin: 1.2rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--code-bg);
+    }
+    .code-block-wrapper pre {
+      margin: 0;
+      padding: 1.2rem 1rem 1rem;
+      background: transparent;
+      overflow-x: auto;
+    }
+    .code-block-wrapper code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
     .code-language-label {
       position: absolute;
-      top: 0.5rem;
-      left: 0.5rem;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.7rem;
+      top: 0.4rem;
+      left: 0.6rem;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      color: #d4dcec;
+      font-size: 0.65rem;
       font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      z-index: 10;
+      padding: 0.15rem 0.7rem;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255,255,255,0.08);
+      z-index: 5;
+      user-select: none;
+      pointer-events: none;
       text-transform: uppercase;
     }
     .copy-code-btn {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: var(--surface);
+      top: 0.4rem;
+      right: 0.6rem;
+      background: rgba(30, 40, 55, 0.7);
+      backdrop-filter: blur(4px);
       color: var(--text-secondary);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 0.15rem 0.8rem;
+      font-size: 0.65rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
-      z-index: 10;
-      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 6;
+      opacity: 0.6;
     }
-    .code-block-wrapper:hover .copy-code-btn { opacity: 1; }
-    .copy-code-btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+    .code-block-wrapper:hover .copy-code-btn {
+      opacity: 1;
+    }
+    .copy-code-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      opacity: 1;
+    }
+    /* 美化超链接 */
+    .markdown-body a {
+      color: var(--link-color);
+      text-decoration: none;
+      border-bottom: 1.5px solid transparent;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .markdown-body a:hover {
+      color: var(--link-hover);
+      border-bottom-color: var(--link-hover);
+      text-decoration: none;
+    }
+    .markdown-body a:visited {
+      color: var(--link-color);
+    }
 
     .pagination {
       display: flex;
@@ -752,10 +801,11 @@
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 回到顶部按钮<br>
-                📑 代码语言标签<br>
+                📑 代码语言标签优化（不遮挡代码）<br>
                 📌 置顶文章发光<br>
                 🖼️ 图片懒加载<br>
-                📤 文章导出功能
+                📤 文章导出功能<br>
+                🔗 超链接美化
               </div>
             </div>
           </div>
@@ -845,7 +895,6 @@
         percentage.textContent = Math.round(progress) + '%';
         if (scrollTop > 100) { percentage.classList.add('visible'); } else { percentage.classList.remove('visible'); }
       }
-      // 回到顶部按钮
       var backToTopBtn = document.getElementById('backToTopBtn');
       if (backToTopBtn) {
         if (scrollTop > 300) { backToTopBtn.classList.add('visible'); } else { backToTopBtn.classList.remove('visible'); }
@@ -924,9 +973,12 @@
           '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
           '</div>';
       };
-      // 图片懒加载
       renderer.image = function(href, title, text) {
         return '<img src="' + href + '" alt="' + (text || '') + '" loading="lazy"' + (title ? ' title="' + title + '"' : '') + '>';
+      };
+      // 美化超链接: 用自定义渲染增加样式类
+      renderer.link = function(href, title, text) {
+        return '<a href="' + href + '"' + (title ? ' title="' + title + '"' : '') + ' target="_blank" rel="noopener">' + text + '</a>';
       };
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
       return marked.parse(text);
@@ -1327,7 +1379,6 @@
       } catch (error) { listEl.innerHTML = '<div class="error-msg">加载失败</div>'; }
     }
 
-    // 导出文章
     function exportPost(issue) {
       var content = '# ' + issue.title + '\n\n';
       content += '> 创建于 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '\n\n';
@@ -1433,7 +1484,6 @@
         showToast('GitHub 登录成功！', '🔑');
       }
       
-      // 回到顶部
       document.getElementById('backToTopBtn').addEventListener('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
