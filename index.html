@@ -79,6 +79,43 @@
       overflow-x: hidden;
       transition: background-color 0.4s ease, color 0.4s ease;
     }
+
+    /* 阅读进度条 */
+    .reading-progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      z-index: 10000;
+      background: transparent;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      width: 0%;
+      transition: width 0.1s ease;
+      border-radius: 0 2px 2px 0;
+    }
+    .reading-progress-percentage {
+      position: fixed;
+      top: 8px;
+      right: 16px;
+      z-index: 10001;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--surface);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .reading-progress-percentage.visible {
+      opacity: 1;
+    }
+
     .blog-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -592,6 +629,12 @@
   </style>
 </head>
 <body>
+  <!-- 阅读进度条 -->
+  <div class="reading-progress-container">
+    <div class="reading-progress-bar" id="readingProgressBar"></div>
+  </div>
+  <div class="reading-progress-percentage" id="readingProgressPercentage">0%</div>
+
   <div class="blog-container">
     <header class="site-header">
       <div class="logo-area" id="logoBtn">
@@ -627,19 +670,12 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.8</div>
+              <div class="changelog-version">v1.1.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 修复浏览量统计<br>
-                🔒 同一IP不重复计数<br>
-                💬 OAuth评论系统
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.0.7</div>
-              <div class="changelog-date">2026-08-21</div>
-              <div class="changelog-desc">
-                ✨ 新增评论系统
+                💬 OAuth评论系统<br>
+                ✨ 新增阅读进度条<br>
+                ✨ 深色/暗色模式
               </div>
             </div>
             <div class="changelog-item">
@@ -695,6 +731,30 @@
       bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记',
       name: 'Mirage_Rover'
     };
+
+    // ==================== 阅读进度条 ====================
+    function updateReadingProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      var bar = document.getElementById('readingProgressBar');
+      var percentage = document.getElementById('readingProgressPercentage');
+      if (bar) bar.style.width = progress + '%';
+      if (percentage) {
+        percentage.textContent = Math.round(progress) + '%';
+        if (scrollTop > 100) {
+          percentage.classList.add('visible');
+        } else {
+          percentage.classList.remove('visible');
+        }
+      }
+    }
+
+    function initReadingProgress() {
+      window.addEventListener('scroll', updateReadingProgress);
+      window.addEventListener('resize', updateReadingProgress);
+      updateReadingProgress();
+    }
 
     function initTheme() {
       var savedTheme = localStorage.getItem('blog_theme');
@@ -845,25 +905,6 @@
       return 2;
     }
 
-    function getViewCountFromLabels(labels) {
-      if (!labels) return 0;
-      for (var i = 0; i < labels.length; i++) {
-        if (labels[i].name && labels[i].name.startsWith('views:')) return parseInt(labels[i].name.replace('views:', '')) || 0;
-      }
-      return 0;
-    }
-
-    function hasViewed(issueNumber) {
-      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
-      return !!viewedPosts[issueNumber];
-    }
-
-    function markAsViewed(issueNumber) {
-      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
-      viewedPosts[issueNumber] = true;
-      localStorage.setItem('blog_viewed_posts', JSON.stringify(viewedPosts));
-    }
-
     function countWords(text) {
       if (!text) return 0;
       var cleanText = text.replace(/[#>*`\-\n\r\t]/g, '');
@@ -876,41 +917,6 @@
       var minutes = Math.ceil(wordCount / 300);
       if (minutes < 1) return '不到 1 分钟';
       return minutes + ' 分钟';
-    }
-
-    async function incrementViewCount(issue) {
-      var currentViews = getViewCountFromLabels(issue.labels);
-      
-      if (hasViewed(issue.number)) {
-        return currentViews;
-      }
-      
-      var newViews = currentViews + 1;
-      var newLabels = issue.labels
-        .filter(function(l) { return !l.name.startsWith('views:'); })
-        .map(function(l) { return l.name; });
-      newLabels.push('views:' + newViews);
-      
-      try {
-        await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels });
-        markAsViewed(issue.number);
-        
-        // 更新本地数据
-        issue.labels = issue.labels.filter(function(l) { return !l.name.startsWith('views:'); });
-        issue.labels.push({ name: 'views:' + newViews });
-        
-        for (var i = 0; i < allPosts.length; i++) {
-          if (allPosts[i].number === issue.number) {
-            allPosts[i].labels = issue.labels;
-            break;
-          }
-        }
-        
-        return newViews;
-      } catch (e) {
-        console.log('更新浏览量失败:', e);
-        return currentViews;
-      }
     }
 
     function loginWithGitHub() {
@@ -1106,11 +1112,10 @@
       var pagePosts = filteredPosts.slice(startIndex, endIndex);
       listEl.innerHTML = pagePosts.map(function(issue) {
         var weight = getWeightFromLabels(issue.labels);
-        var views = getViewCountFromLabels(issue.labels);
         var wordCount = countWords(issue.body || '');
         var readTime = estimateReadTime(wordCount);
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
         var weightBadge = isAdmin ? '<span class="weight-badge">⚖️ ' + weight + '</span>' : '';
         return '<article class="post-card" data-issue="' + issue.number + '">' +
           '<div class="post-meta">' +
@@ -1118,7 +1123,6 @@
           weightBadge +
           '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
           '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
-          '<span class="stat-badge">👁️ ' + views + ' 次浏览</span>' +
           '</div>' +
           '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
           '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
@@ -1149,7 +1153,7 @@
       var allTags = {};
       allPosts.forEach(function(issue) {
         issue.labels.forEach(function(label) {
-          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:') && !label.name.startsWith('views:')) {
+          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:')) {
             if (!allTags[label.name]) allTags[label.name] = 0;
             allTags[label.name]++;
           }
@@ -1173,12 +1177,11 @@
         var content = renderMarkdown(rawContent);
         var headings = generateTOC(content);
         renderFloatingTOC(headings);
-        var views = await incrementViewCount(issue);
         var wordCount = countWords(rawContent);
         var readTime = estimateReadTime(wordCount);
         var weight = getWeightFromLabels(issue.labels);
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
         var adminButtons = isAdmin ? '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' + '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' + '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
         
         var comments = await loadComments(issueNumber);
@@ -1196,7 +1199,6 @@
           weightDisplay +
           '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
           '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
-          '<span class="stat-badge">👁️ ' + views + ' 次浏览</span>' +
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
@@ -1259,7 +1261,7 @@
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
-      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return l.name; }) : [];
+      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return l.name; }) : [];
       var existingWeight = existingData ? getWeightFromLabels(existingData.labels) : 2;
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
@@ -1309,6 +1311,7 @@
 
     window.addEventListener('DOMContentLoaded', function() {
       initTheme();
+      initReadingProgress();
       updateSidebarProfile();
       
       var urlParams = new URLSearchParams(window.location.search);
