@@ -628,19 +628,19 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.7</div>
+              <div class="changelog-version">v1.0.8</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 新增评论系统<br>
-                🔑 支持 GitHub OAuth 登录<br>
-                💬 访客可用自己账号评论
+                ✨ 修复浏览量统计<br>
+                🔒 同一IP不重复计数<br>
+                💬 OAuth评论系统
               </div>
             </div>
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.6</div>
+              <div class="changelog-version">v1.0.7</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 云端浏览量统计
+                ✨ 新增评论系统
               </div>
             </div>
             <div class="changelog-item">
@@ -854,6 +854,18 @@
       return 0;
     }
 
+    // 同一 IP（浏览器）不重复计数
+    function hasViewed(issueNumber) {
+      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
+      return !!viewedPosts[issueNumber];
+    }
+
+    function markAsViewed(issueNumber) {
+      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
+      viewedPosts[issueNumber] = true;
+      localStorage.setItem('blog_viewed_posts', JSON.stringify(viewedPosts));
+    }
+
     function countWords(text) {
       if (!text) return 0;
       var cleanText = text.replace(/[#>*`\-\n\r\t]/g, '');
@@ -870,11 +882,26 @@
 
     async function incrementViewCount(issue) {
       var currentViews = getViewCountFromLabels(issue.labels);
+      
+      // 已经浏览过，直接返回
+      if (hasViewed(issue.number)) {
+        return currentViews;
+      }
+      
       var newViews = currentViews + 1;
-      var newLabels = issue.labels.filter(function(l) { return !l.name.startsWith('views:'); }).map(function(l) { return l.name; });
+      var newLabels = issue.labels
+        .filter(function(l) { return !l.name.startsWith('views:'); })
+        .map(function(l) { return l.name; });
       newLabels.push('views:' + newViews);
-      try { await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels }); } catch (e) { console.log('更新浏览量失败:', e); }
-      return newViews;
+      
+      try {
+        await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels });
+        markAsViewed(issue.number);
+        return newViews;
+      } catch (e) {
+        console.log('更新浏览量失败:', e);
+        return currentViews;
+      }
     }
 
     // ==================== OAuth 登录 ====================
@@ -885,10 +912,8 @@
     function logoutGitHub() {
       localStorage.removeItem('github_oauth_token');
       showMessage('success', '已退出登录');
-      if (document.getElementById('commentsList')) {
-        var currentIssueNumber = localStorage.getItem('current_issue_number');
-        if (currentIssueNumber) showPost(currentIssueNumber);
-      }
+      var currentIssueNumber = localStorage.getItem('current_issue_number');
+      if (currentIssueNumber) showPost(currentIssueNumber);
     }
 
     function isUserLoggedIn() {
@@ -1148,7 +1173,6 @@
         var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
         var adminButtons = isAdmin ? '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' + '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' + '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
         
-        // 加载评论
         var comments = await loadComments(issueNumber);
         var userLoggedIn = isUserLoggedIn();
         var commentButtons = userLoggedIn ?
@@ -1185,7 +1209,6 @@
           document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
         }
         
-        // 评论按钮事件
         if (userLoggedIn) {
           document.getElementById('submitCommentBtn').addEventListener('click', function() {
             var commentInput = document.getElementById('commentInput');
