@@ -43,6 +43,8 @@
       --banner-gradient: linear-gradient(135deg, #1e3a5f, #2c4a6e);
       --gold: #d4a574;
       --gold-soft: #3a2f1e;
+      --link-color: #6cb2f7;
+      --link-hover: #8ec5ff;
     }
 
     :root[data-theme="light"] {
@@ -70,6 +72,8 @@
       --banner-gradient: linear-gradient(135deg, #bee3f8, #90cdf4);
       --gold: #b8860b;
       --gold-soft: #fef3c7;
+      --link-color: #3182ce;
+      --link-hover: #2b6cb0;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -117,7 +121,6 @@
     }
     .reading-progress-percentage.visible { opacity: 1; }
 
-    /* 回到顶部按钮 */
     .back-to-top {
       position: fixed;
       bottom: 30px;
@@ -136,19 +139,20 @@
       box-shadow: 0 4px 15px rgba(79, 156, 247, 0.4);
       opacity: 0;
       visibility: hidden;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
+      transform: translateY(20px) scale(0.8);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 999;
     }
     .back-to-top.visible {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
     .back-to-top:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.1);
       box-shadow: 0 8px 25px rgba(79, 156, 247, 0.6);
     }
+    .back-to-top:active { transform: scale(0.9); }
 
     .toast-notification {
       position: fixed;
@@ -186,6 +190,10 @@
       0%, 100% { box-shadow: 0 0 5px rgba(212, 165, 116, 0.3); }
       50% { box-shadow: 0 0 20px rgba(212, 165, 116, 0.6); }
     }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
 
     .site-header {
       display: flex;
@@ -198,13 +206,16 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease;
-      transition: background-color 0.4s ease, border-color 0.4s ease;
+      transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
     }
+    .site-header:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
     .logo-area { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; user-select: none; transition: transform 0.3s ease; }
     .logo-area:hover { transform: scale(1.03); }
     .logo-icon { font-size: 2rem; animation: bounce 3s ease-in-out infinite; }
-    .logo-text { font-size: 1.8rem; font-weight: 700; color: var(--text); }
-    .logo-text span { color: var(--accent); }
+    .logo-text { font-size: 1.8rem; font-weight: 700; color: var(--text); transition: all 0.3s ease; }
+    .logo-text span { color: var(--accent); display: inline-block; transition: transform 0.3s ease; }
+    .logo-area:hover .logo-text span { transform: rotate(-5deg); }
     .logo-text em {
       font-style: normal;
       color: var(--accent);
@@ -213,7 +224,9 @@
       border-radius: 40px;
       font-size: 0.7em;
       margin-left: 6px;
+      transition: all 0.3s ease;
     }
+    .logo-text em:hover { background: var(--accent); color: #0d1117; }
     .nav-links { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
     .nav-links a {
       color: var(--text-secondary);
@@ -250,7 +263,7 @@
       font-weight: 600;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-block;
       user-select: none;
       position: relative;
@@ -270,11 +283,11 @@
     }
     .btn:hover::before { width: 300px; height: 300px; }
     .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 156, 247, 0.4); }
-    .btn:active { transform: translateY(0); }
+    .btn:active { transform: translateY(0) scale(0.95); }
     .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
-    .btn-secondary:hover { border-color: var(--text-secondary); }
+    .btn-secondary:hover { border-color: var(--text-secondary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
-    .btn-danger:hover { background: var(--red); color: white; }
+    .btn-danger:hover { background: var(--red); color: white; box-shadow: 0 4px 12px rgba(224, 108, 117, 0.4); }
 
     .main-grid {
       display: grid;
@@ -296,17 +309,20 @@
     }
     .post-card.pinned {
       border-color: var(--gold);
-      animation: glow 2s ease-in-out infinite;
+      animation: glow 2s ease-in-out infinite, fadeInUp 0.5s ease backwards;
     }
     .post-card:nth-child(1) { animation-delay: 0.05s; }
     .post-card:nth-child(2) { animation-delay: 0.1s; }
     .post-card:nth-child(3) { animation-delay: 0.15s; }
+    .post-card:nth-child(4) { animation-delay: 0.2s; }
+    .post-card:nth-child(5) { animation-delay: 0.25s; }
     .post-card:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       transform: translateY(-4px) scale(1.01);
     }
+    .post-card:active { transform: scale(0.98); }
     .post-meta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.8rem; align-items: center; }
     .post-date { font-size: 0.8rem; color: var(--text-secondary); }
     .post-tag {
@@ -318,7 +334,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    .post-tag:hover { background: var(--accent); color: #ffffff; }
+    .post-tag:hover { background: var(--accent); color: #ffffff; transform: scale(1.05); }
     .weight-badge {
       font-size: 0.7rem;
       padding: 0.2rem 0.7rem;
@@ -334,6 +350,7 @@
       background: var(--gold-soft);
       color: var(--gold);
       font-weight: 700;
+      animation: pulse 2s ease-in-out infinite;
     }
     .stat-badge {
       font-size: 0.7rem;
@@ -344,25 +361,29 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
+      transition: all 0.3s ease;
     }
-    .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
+    .stat-badge:hover { background: var(--accent); color: #fff; }
+    .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* 代码块语言标签 */
     .code-block-wrapper { position: relative; margin: 1rem 0; }
+    .code-block-wrapper pre { padding-top: 2.5rem !important; }
     .code-language-label {
       position: absolute;
       top: 0.5rem;
-      left: 0.5rem;
+      left: 0.8rem;
       background: var(--accent-soft);
       color: var(--accent);
       font-size: 0.7rem;
       font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      z-index: 10;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      z-index: 5;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
     }
     .copy-code-btn {
       position: absolute;
@@ -376,11 +397,11 @@
       font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      z-index: 10;
+      z-index: 5;
       opacity: 0;
     }
     .code-block-wrapper:hover .copy-code-btn { opacity: 1; }
-    .copy-code-btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+    .copy-code-btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); transform: scale(1.05); }
 
     .pagination {
       display: flex;
@@ -389,7 +410,8 @@
       margin-top: 1.5rem;
       flex-wrap: wrap;
     }
-    .pagination .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; min-width: 36px; text-align: center; }
+    .pagination .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; min-width: 36px; text-align: center; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .pagination .btn:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(79,156,247,0.4); }
 
     .search-box {
       display: flex;
@@ -401,191 +423,8 @@
       padding: 0.5rem 1rem;
       transition: all 0.3s ease;
     }
-    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.1); }
+    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 156, 247, 0.15); transform: scale(1.02); }
     .search-box input { background: transparent; border: none; outline: none; color: var(--text); font-size: 0.9rem; width: 150px; }
-
-    .editor {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      animation: fadeInUp 0.5s ease;
-    }
-    .editor input[type="text"], .editor input[type="url"] {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-    .editor textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      min-height: 300px;
-      resize: vertical;
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      line-height: 1.6;
-    }
-    .editor label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; margin-top: 0.8rem; }
-    .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: var(--accent); }
-    .editor select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: 8px; font-size: 0.9rem; }
-
-    .tag-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-    .tag-input-row input { flex: 1; min-width: 150px; margin-bottom: 0 !important; }
-    .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .tag-chip {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      background: var(--accent-soft);
-      color: var(--accent);
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-    }
-    .tag-chip .remove-tag { cursor: pointer; font-weight: bold; }
-    .tag-chip .remove-tag:hover { color: var(--red); }
-
-    .profile-page {
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      animation: fadeInUp 0.5s ease;
-    }
-    .profile-banner { height: 200px; background-size: cover; background-position: center; position: relative; }
-    .profile-banner .banner-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: linear-gradient(to top, var(--surface), transparent);
-    }
-    .profile-info {
-      display: flex;
-      align-items: flex-end;
-      gap: 1.5rem;
-      padding: 0 2rem;
-      margin-top: -50px;
-      position: relative;
-      z-index: 1;
-    }
-    .profile-avatar-large {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 4px solid var(--surface);
-      background-size: cover;
-      background-position: center;
-      background-color: var(--accent-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      box-shadow: var(--shadow);
-    }
-    .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--text); }
-    .profile-bio { color: var(--text-secondary); font-size: 0.95rem; padding: 1rem 2rem 2rem; }
-    .profile-edit-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; }
-
-    .comments-section {
-      margin-top: 2rem;
-      border-top: 1px solid var(--border);
-      padding-top: 1.5rem;
-    }
-    .comments-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
-    .comment-item {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 0.8rem;
-    }
-    .comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-    .comment-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-size: cover;
-      background-position: center;
-      background-color: var(--accent-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-    }
-    .comment-author { font-weight: 600; font-size: 0.85rem; }
-    .comment-date { font-size: 0.75rem; color: var(--text-secondary); }
-    .comment-body { font-size: 0.9rem; color: var(--text); white-space: pre-wrap; word-break: break-word; }
-    .comment-input-area { margin-top: 1rem; }
-    .comment-input-area textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      min-height: 80px;
-      resize: vertical;
-    }
-    .comment-input-area textarea:focus { outline: none; border-color: var(--accent); }
-
-    .password-error {
-      color: var(--error-text);
-      font-size: 0.75rem;
-      margin-top: -0.5rem;
-      margin-bottom: 0.5rem;
-      display: none;
-    }
-    .password-error.visible { display: block; }
-
-    .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
-    .error-msg { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-    .success-msg { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-
-    .password-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-overlay);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .password-modal.active { display: flex; }
-    .password-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      width: 90%;
-      max-width: 400px;
-      animation: fadeInUp 0.3s ease;
-    }
-    .password-box h2 { margin-bottom: 1rem; color: var(--text); }
-    .password-box input {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
 
     .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
     .sidebar-card {
@@ -593,10 +432,12 @@
       border-radius: var(--radius);
       padding: 1.5rem;
       border: 1px solid var(--border);
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      animation: fadeInUp 0.5s ease backwards;
     }
-    .sidebar-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-2px); }
-    .sidebar-card h3 { margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none; }
+    .sidebar-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+    .sidebar-card h3 { margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none; transition: color 0.3s ease; }
+    .sidebar-card h3:hover { color: var(--accent); }
     .sidebar-card h3 .arrow { transition: transform 0.3s ease; display: inline-block; }
     .sidebar-card h3 .arrow.collapsed { transform: rotate(-90deg); }
     .author-box { text-align: center; cursor: pointer; }
@@ -609,79 +450,78 @@
       justify-content: center;
       font-size: 2.4rem;
       margin: 0 auto 0.8rem;
-      transition: all 0.4s ease;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
       background-size: cover;
       background-position: center;
       background-color: var(--accent-soft);
     }
-    .avatar:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 20px rgba(79, 156, 247, 0.3); }
+    .avatar:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 25px rgba(79, 156, 247, 0.4); }
     .author-name { font-weight: 700; font-size: 1.2rem; color: var(--text); }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    .changelog { max-height: 300px; overflow-y: auto; transition: max-height 0.4s ease; }
-    .changelog.collapsed { max-height: 0; overflow: hidden; }
-    .changelog-item { padding: 0.8rem 0; border-bottom: 1px dashed var(--border); }
-    .changelog-item:last-child { border-bottom: none; }
-    .changelog-version { font-weight: 600; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.3rem; }
-    .changelog-date { font-size: 0.75rem; color: var(--text-secondary); }
-    .changelog-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
-
-    .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-
-    .shortcut-content { max-height: 200px; overflow-y: auto; transition: max-height 0.4s ease; }
-    .shortcut-content.collapsed { max-height: 0; overflow: hidden; }
-    .shortcut-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.35rem 0;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
+    .markdown-body { margin-top: 1.5rem; line-height: 1.8; animation: fadeIn 0.5s ease; color: var(--text); }
+    .markdown-body pre {
+      background: var(--code-bg);
+      padding: 1.2rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
     }
-    .shortcut-row kbd {
-      background: var(--bg);
+    .markdown-body pre:hover { box-shadow: 0 0 15px rgba(79, 156, 247, 0.15); border-color: var(--accent); }
+    .markdown-body code {
+      background: var(--code-bg);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+      color: var(--text);
     }
-
-    #sidebarTOC {
-      position: fixed;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      max-width: 250px;
-      max-height: 60vh;
-      overflow-y: auto;
-      z-index: 100;
-      display: none;
-    }
-    #sidebarTOC.visible { display: block; }
-    #sidebarTOC .toc-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: var(--shadow);
-    }
-    #sidebarTOC .toc-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
-    #sidebarTOC .toc-item {
-      display: block;
-      color: var(--text-secondary);
+    .markdown-body pre code { background: none; padding: 0; font-size: 0.85rem; }
+    /* 美化超链接 */
+    .markdown-body a {
+      color: var(--link-color);
       text-decoration: none;
-      font-size: 0.8rem;
-      padding: 0.3rem 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      border-bottom: 1px dashed var(--link-color);
+      padding: 0 2px;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
     }
-    #sidebarTOC .toc-item:hover { color: var(--accent); background: var(--accent-soft); }
-    #sidebarTOC .toc-item.active { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
+    .markdown-body a::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--link-hover);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s ease;
+    }
+    .markdown-body a:hover {
+      color: var(--link-hover);
+      border-bottom-color: transparent;
+      background: var(--accent-soft);
+      border-radius: 4px;
+      padding: 0 4px;
+    }
+    .markdown-body a:hover::before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    .markdown-body a:active { transform: scale(0.97); }
+
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .shortcut-content { max-height: 200px; overflow-y: auto; transition: max-height 0.4s ease; }
+    .shortcut-content.collapsed { max-height: 0; overflow: hidden; }
+    .shortcut-row { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; font-size: 0.8rem; color: var(--text-secondary); }
+    .shortcut-row kbd { background: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; border: 1px solid var(--border); }
+
+    .password-error { color: var(--error-text); font-size: 0.75rem; margin-top: -0.5rem; margin-bottom: 0.5rem; display: none; }
+    .password-error.visible { display: block; animation: fadeIn 0.3s ease; }
+    .loading { text-align: center; padding: 3rem; color: var(--text-secondary); animation: pulse 2s ease-in-out infinite; }
 
     @media (max-width: 900px) {
       .main-grid { grid-template-columns: 1fr; }
@@ -699,18 +539,11 @@
   </style>
 </head>
 <body>
-  <div class="reading-progress-container">
-    <div class="reading-progress-bar" id="readingProgressBar"></div>
-  </div>
+  <div class="reading-progress-container"><div class="reading-progress-bar" id="readingProgressBar"></div></div>
   <div class="reading-progress-percentage" id="readingProgressPercentage">0%</div>
-  
   <button class="back-to-top" id="backToTopBtn" title="回到顶部">↑</button>
-
   <div class="toast-notification" id="toastNotification">
-    <div class="toast-content">
-      <span class="toast-icon">✅</span>
-      <span class="toast-message">管理员验证成功</span>
-    </div>
+    <div class="toast-content"><span class="toast-icon">✅</span><span class="toast-message">成功</span></div>
   </div>
 
   <div class="blog-container">
@@ -724,18 +557,13 @@
         <a id="adminBtn">🔐 管理</a>
         <a id="themeToggle" title="切换主题">🌙</a>
       </nav>
-      <div class="search-box">
-        <span>🔍</span>
-        <input type="text" id="searchInput" placeholder="搜索文章...">
-      </div>
+      <div class="search-box"><span>🔍</span><input type="text" id="searchInput" placeholder="搜索文章..."></div>
     </header>
 
     <div id="messageArea"></div>
 
     <div class="main-grid">
-      <main class="post-list" id="postList">
-        <div class="loading">加载中...</div>
-      </main>
+      <main class="post-list" id="postList"><div class="loading">加载中...</div></main>
       <aside class="sidebar">
         <div class="sidebar-card">
           <div class="author-box" id="profileCard">
@@ -748,47 +576,40 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.3.0</div>
+              <div class="changelog-version">v1.3.1</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 回到顶部按钮<br>
-                📑 代码语言标签<br>
-                📌 置顶文章发光<br>
-                🖼️ 图片懒加载<br>
-                📤 文章导出功能
+                ✨ 修复代码标签遮挡<br>
+                🎨 恢复动效<br>
+                🔗 美化超链接
               </div>
             </div>
           </div>
         </div>
         <div class="sidebar-card">
           <h3>🏷️ 标签筛选</h3>
-          <div class="tag-cloud" id="tagCloud">
-            <span class="loading" style="padding:1rem;">加载标签...</span>
-          </div>
+          <div class="tag-cloud" id="tagCloud"><span class="loading">加载标签...</span></div>
         </div>
         <div class="sidebar-card">
           <h3 id="shortcutToggle"><span class="arrow collapsed" id="shortcutArrow">▼</span> ⌨️ 快捷键</h3>
           <div class="shortcut-content collapsed" id="shortcutContent">
             <div class="shortcut-row"><span>🔍 搜索</span><kbd>Alt+K</kbd></div>
-            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Alt+T</kbd></div>
+            <div class="shortcut-row"><span>🌙 主题</span><kbd>Alt+T</kbd></div>
             <div class="shortcut-row"><span>🏠 首页</span><kbd>Alt+H</kbd></div>
-            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Alt+P</kbd></div>
+            <div class="shortcut-row"><span>👤 主页</span><kbd>Alt+P</kbd></div>
             <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Alt+N</kbd></div>
-            <div class="shortcut-row"><span>❌ 关闭/返回</span><kbd>Esc</kbd></div>
           </div>
         </div>
       </aside>
     </div>
   </div>
 
-  <div id="sidebarTOC"></div>
-
   <div class="password-modal" id="passwordModal">
     <div class="password-box">
       <h2>🔐 管理员验证</h2>
       <input type="password" id="passwordInput" placeholder="管理密码">
       <div class="password-error" id="passwordError">密码错误，请重试</div>
-      <div style="display: flex; gap: 0.5rem;">
+      <div style="display:flex;gap:0.5rem;">
         <button class="btn" id="passwordConfirmBtn">确认</button>
         <button class="btn btn-secondary" id="passwordCancelBtn">取消</button>
       </div>
@@ -802,668 +623,56 @@
     const PROFILE_LABEL = 'profile-data';
     const GITHUB_OWNER = 'User-dusttle';
     const GITHUB_REPO = 'Blog';
-    
-    let isAdmin = false;
-    let allPosts = [];
-    let activeTag = null;
-    let searchQuery = '';
-    let currentPage = 1;
+    let isAdmin = false, allPosts = [], activeTag = null, searchQuery = '', currentPage = 1, totalPages = 1;
     const perPage = 10;
-    let totalPages = 1;
-    let profile = {
-      avatar: '',
-      banner: '',
-      bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记',
-      name: 'Mirage_Rover'
-    };
+    let profile = { avatar: '', banner: '', bio: 'OIer / 算法竞赛选手\n分享题解与学习笔记', name: 'Mirage_Rover' };
 
-    function showToast(message, icon) {
-      var toast = document.getElementById('toastNotification');
-      var toastMessage = toast.querySelector('.toast-message');
-      var toastIcon = toast.querySelector('.toast-icon');
-      toastMessage.textContent = message;
-      toastIcon.textContent = icon || '✅';
-      toast.classList.remove('fade-out');
-      toast.classList.add('show');
-      setTimeout(function() {
-        toast.classList.add('fade-out');
-        setTimeout(function() {
-          toast.classList.remove('show');
-          toast.classList.remove('fade-out');
-        }, 500);
-      }, 2500);
-    }
+    function showToast(message, icon) { var t=document.getElementById('toastNotification'); t.querySelector('.toast-message').textContent=message; t.querySelector('.toast-icon').textContent=icon||'✅'; t.classList.remove('fade-out'); t.classList.add('show'); setTimeout(function(){t.classList.add('fade-out');setTimeout(function(){t.classList.remove('show','fade-out');},500);},2500); }
+    function updateReadingProgress() { var st=window.pageYOffset||document.documentElement.scrollTop; var sh=document.documentElement.scrollHeight-document.documentElement.clientHeight; var p=sh>0?(st/sh)*100:0; var bar=document.getElementById('readingProgressBar'); var pct=document.getElementById('readingProgressPercentage'); if(bar)bar.style.width=p+'%'; if(pct){pct.textContent=Math.round(p)+'%'; st>100?pct.classList.add('visible'):pct.classList.remove('visible');} var btt=document.getElementById('backToTopBtn'); if(btt){st>300?btt.classList.add('visible'):btt.classList.remove('visible');} }
+    function initTheme() { var s=localStorage.getItem('blog_theme'); var t=document.getElementById('themeToggle'); if(s==='light'){document.documentElement.setAttribute('data-theme','light');t.textContent='☀️';document.getElementById('hljs-dark').disabled=true;document.getElementById('hljs-light').disabled=false;}else{document.documentElement.setAttribute('data-theme','dark');t.textContent='🌙';document.getElementById('hljs-dark').disabled=false;document.getElementById('hljs-light').disabled=true;} }
+    function toggleTheme() { var c=document.documentElement.getAttribute('data-theme'); var t=document.getElementById('themeToggle'); if(c==='light'){document.documentElement.setAttribute('data-theme','dark');t.textContent='🌙';localStorage.setItem('blog_theme','dark');document.getElementById('hljs-dark').disabled=false;document.getElementById('hljs-light').disabled=true;}else{document.documentElement.setAttribute('data-theme','light');t.textContent='☀️';localStorage.setItem('blog_theme','light');document.getElementById('hljs-dark').disabled=true;document.getElementById('hljs-light').disabled=false;} }
+    function escapeHtml(t) { if(!t)return ''; var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function renderMarkdown(text) { if(typeof marked==='undefined')return escapeHtml(text).replace(/\n/g,'<br>'); var r=new marked.Renderer(); r.heading=function(t,l){var id='h-'+Math.random().toString(36).substr(2,6);return '<h'+l+' id="'+id+'">'+t+'</h'+l+'>';}; r.code=function(code,lang){var hl='';if(typeof hljs!=='undefined'){try{hl=(lang&&hljs.getLanguage(lang))?hljs.highlight(code,{language:lang,ignoreIllegals:true}).value:hljs.highlightAuto(code).value;}catch(e){hl=escapeHtml(code);}}else{hl=escapeHtml(code);}var lbl=lang?'<span class="code-language-label">'+escapeHtml(lang)+'</span>':'';return '<div class="code-block-wrapper">'+lbl+'<button class="copy-code-btn" onclick="copyCode(this)">📋 复制</button><pre><code class="hljs">'+hl+'</code></pre></div>';}; r.image=function(href,title,text){return '<img src="'+href+'" alt="'+(text||'')+'" loading="lazy"'+(title?' title="'+title+'"':'')+'>';}; marked.setOptions({breaks:true,gfm:true,renderer:r}); return marked.parse(text); }
+    function copyCode(btn){var pre=btn.parentElement.querySelector('pre code');var code=pre?pre.textContent:'';if(navigator.clipboard){navigator.clipboard.writeText(code).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋 复制';},2000);});}else{var ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='✅';setTimeout(function(){btn.textContent='📋 复制';},2000);}}
+    function getWeightFromLabels(l){if(!l)return 2;for(var i=0;i<l.length;i++){if(l[i].name&&l[i].name.startsWith('weight:'))return parseInt(l[i].name.replace('weight:',''))||2;}return 2;}
+    function countWords(t){if(!t)return 0;var c=t.replace(/[#>*`\-\n\r\t]/g,'');return(c.match(/[\u4e00-\u9fa5]/g)||[]).length+(c.match(/[a-zA-Z0-9_]+/g)||[]).length;}
+    function estimateReadTime(w){var m=Math.ceil(w/300);return m<1?'不到1分钟':m+'分钟';}
+    async function proxyRequest(method,endpoint,body,useAdmin){var url=PROXY_URL+endpoint;var headers={'Content-Type':'application/json'};if(useAdmin)headers['Authorization']='Bearer '+ADMIN_PASSWORD;var opts={method:method,headers:headers};if(body)opts.body=JSON.stringify(body);var resp=await fetch(url,opts);if(!resp.ok)throw new Error('API Error');return resp.json();}
+    async function loadPosts(){var el=document.getElementById('postList');el.innerHTML='<div class="loading">加载中...</div>';try{var issues=await proxyRequest('GET','/api/issues?state=open&labels='+LABEL_PREFIX+'&per_page=100');allPosts=issues.filter(function(i){return i.labels.some(function(l){return l.name===LABEL_PREFIX;});});allPosts.sort(function(a,b){var wa=getWeightFromLabels(a.labels),wb=getWeightFromLabels(b.labels);if(wb!==wa)return wb-wa;return new Date(b.created_at)-new Date(a.created_at);});currentPage=1;renderPosts();renderTagCloud();}catch(e){el.innerHTML='<div class="loading">加载失败</div>';}}
+    function renderPosts(){var el=document.getElementById('postList');var fp=allPosts;if(activeTag)fp=fp.filter(function(i){return i.labels.some(function(l){return l.name===activeTag;});});if(searchQuery){var q=searchQuery.toLowerCase();fp=fp.filter(function(i){return i.title.toLowerCase().includes(q)||(i.body&&i.body.toLowerCase().includes(q));});}totalPages=Math.ceil(fp.length/perPage);if(currentPage>totalPages)currentPage=1;if(fp.length===0){el.innerHTML='<div class="loading">暂无文章</div>';return;}var si=(currentPage-1)*perPage,ei=Math.min(si+perPage,fp.length);var pp=fp.slice(si,ei);el.innerHTML=pp.map(function(i){var w=getWeightFromLabels(i.labels);var pinned=w>=3;var wc=countWords(i.body||'');var rt=estimateReadTime(wc);var prev=i.body?i.body.replace(/```[\s\S]*?```/g,'[代码]').slice(0,150)+'...':'';var tags=i.labels.filter(function(l){return l.name!==LABEL_PREFIX&&!l.name.startsWith('weight:');}).map(function(l){return '<span class="post-tag" data-tag="'+l.name+'">'+escapeHtml(l.name)+'</span>';}).join('');return '<article class="post-card'+(pinned?' pinned':'')+'" data-issue="'+i.number+'"><div class="post-meta"><span class="post-date">📅 '+new Date(i.created_at).toLocaleDateString('zh-CN')+'</span>'+(pinned?'<span class="pinned-badge">📌 置顶</span>':'')+'<span class="stat-badge">📝 '+wc+'字</span><span class="stat-badge">⏱️ '+rt+'</span></div><h2 class="post-title">'+escapeHtml(i.title)+'</h2><p class="post-excerpt">'+escapeHtml(prev)+'</p>'+(tags?'<div class="post-meta">'+tags+'</div>':'')+'</article>';}).join('');if(totalPages>1){el.innerHTML+='<div class="pagination">'+(currentPage>1?'<button class="btn btn-secondary" onclick="goToPage('+(currentPage-1)+')">←</button>':'')+Array.from({length:totalPages},function(_,i){return '<button class="btn'+(i+1===currentPage?'':' btn-secondary')+'" onclick="goToPage('+(i+1)+')">'+(i+1)+'</button>';}).join('')+(currentPage<totalPages?'<button class="btn btn-secondary" onclick="goToPage('+(currentPage+1)+')">→</button>':'')+'</div>';}document.querySelectorAll('.post-card').forEach(function(c){c.addEventListener('click',function(e){if(e.target.classList.contains('post-tag')){e.stopPropagation();activeTag=e.target.getAttribute('data-tag');currentPage=1;renderPosts();renderTagCloud();}else{showPost(this.getAttribute('data-issue'));}});});}
+    function goToPage(p){currentPage=p;renderPosts();window.scrollTo({top:0,behavior:'smooth'});}
+    function renderTagCloud(){var tc=document.getElementById('tagCloud');var tags={};allPosts.forEach(function(i){i.labels.forEach(function(l){if(l.name!==LABEL_PREFIX&&!l.name.startsWith('weight:')){tags[l.name]=(tags[l.name]||0)+1;}});});var names=Object.keys(tags);if(names.length===0){tc.innerHTML='<span>暂无标签</span>';return;}tc.innerHTML=names.map(function(t){return '<span class="post-tag" data-tag="'+t+'" style="cursor:pointer;">'+escapeHtml(t)+' ('+tags[t]+')</span>';}).join('');tc.querySelectorAll('.post-tag').forEach(function(t){t.addEventListener('click',function(){activeTag=this.getAttribute('data-tag');currentPage=1;renderPosts();renderTagCloud();});});}
+    async function showPost(num){var el=document.getElementById('postList');el.innerHTML='<div class="loading">加载中...</div>';try{var issue=await proxyRequest('GET','/api/issues/'+num);var content=renderMarkdown(issue.body||'');var headings=[];var tempDiv=document.createElement('div');tempDiv.innerHTML=content;tempDiv.querySelectorAll('h1,h2,h3').forEach(function(h,i){h.id='h-'+i;headings.push({level:h.tagName,text:h.textContent,id:h.id});});var wc=countWords(issue.body||'');var rt=estimateReadTime(wc);var tags=issue.labels.filter(function(l){return l.name!==LABEL_PREFIX&&!l.name.startsWith('weight:');}).map(function(l){return '<span class="post-tag">'+escapeHtml(l.name)+'</span>';}).join(' ');var adminBtns=isAdmin?'<div style="margin-top:2rem;display:flex;gap:0.8rem;"><button class="btn btn-secondary" id="editBtn">✏️</button><button class="btn btn-danger" id="delBtn">🗑️</button><button class="btn btn-secondary" id="expBtn">📤</button></div>':'';el.innerHTML='<div class="post-detail"><button class="btn btn-secondary" id="backBtn">← 返回</button><h1>'+escapeHtml(issue.title)+'</h1><div class="post-meta"><span class="post-date">📅 '+new Date(issue.created_at).toLocaleDateString('zh-CN')+'</span><span class="stat-badge">📝 '+wc+'字</span><span class="stat-badge">⏱️ '+rt+'</span>'+tags+'</div>'+(headings.length>0?'<div class="sidebar-card"><h3 style="cursor:default;">📑 目录</h3>'+headings.map(function(h){var ind=h.level==='H1'?0:h.level==='H2'?1:2;return '<a href="#'+h.id+'" class="toc-item" style="display:block;padding-left:'+(ind*15+8)+'px;color:var(--text-secondary);text-decoration:none;cursor:pointer;font-size:0.85rem;">'+escapeHtml(h.text)+'</a>';}).join('')+'</div>':'')+'<div class="markdown-body">'+content+'</div>'+adminBtns+'</div>';document.getElementById('backBtn').addEventListener('click',loadPosts);if(isAdmin){document.getElementById('editBtn').addEventListener('click',function(){editPost(num);});document.getElementById('delBtn').addEventListener('click',function(){deletePost(num,issue.title);});document.getElementById('expBtn').addEventListener('click',function(){exportPost(issue);});}document.querySelectorAll('.toc-item').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var target=document.getElementById(this.getAttribute('href').substring(1));if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});});if(typeof MathJax!=='undefined'&&MathJax.typesetPromise){MathJax.typesetPromise([document.querySelector('.markdown-body')]).catch(function(){});}}catch(e){el.innerHTML='<div class="loading">加载失败</div>';}}
+    function exportPost(issue){var content='# '+issue.title+'\n\n> 创建于 '+new Date(issue.created_at).toLocaleDateString('zh-CN')+'\n\n'+issue.body;var blob=new Blob([content],{type:'text/markdown'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=issue.title.replace(/[^\w\u4e00-\u9fa5]/g,'_')+'.md';a.click();showToast('已导出','📤');}
+    function showPasswordModal(){document.getElementById('passwordModal').classList.add('active');document.getElementById('passwordInput').value='';document.getElementById('passwordError').classList.remove('visible');document.getElementById('passwordInput').focus();}
+    function hidePasswordModal(){document.getElementById('passwordModal').classList.remove('active');}
+    function verifyPassword(){if(document.getElementById('passwordInput').value===ADMIN_PASSWORD){isAdmin=true;hidePasswordModal();showToast('管理员验证成功','✅');document.getElementById('adminBtn').textContent='✏️ 写文章';loadPosts();}else{document.getElementById('passwordError').classList.add('visible');document.getElementById('passwordInput').value='';}}
+    function showEditor(num,data){if(!isAdmin){showPasswordModal();return;}var el=document.getElementById('postList');var isEdit=num!==null&&num!==undefined;var tv=data?escapeHtml(data.title):'';var cv=data?escapeHtml(data.body):'';var et=data?data.labels.filter(function(l){return l.name!==LABEL_PREFIX&&!l.name.startsWith('weight:');}).map(function(l){return l.name;}):[];var ew=data?getWeightFromLabels(data.labels):2;el.innerHTML='<div class="editor"><h2>'+(isEdit?'编辑文章':'撰写新文章')+'</h2><input type="text" id="editTitle" value="'+tv+'"><select id="editWeight">'+(ew===1?'<option value="1" selected>1-置底</option>':'<option value="1">1-置底</option>')+(ew===2?'<option value="2" selected>2-默认</option>':'<option value="2">2-默认</option>')+(ew===3?'<option value="3" selected>3-置顶</option>':'<option value="3">3-置顶</option>')+(ew===4?'<option value="4" selected>4-高优先级</option>':'<option value="4">4-高优先级</option>')+(ew===5?'<option value="5" selected>5-最高</option>':'<option value="5">5-最高</option>')+'</select><div class="tag-input-row"><input type="text" id="tagInput" placeholder="标签"><button class="btn btn-secondary" id="addTagBtn">添加</button></div><div class="tag-list" id="tagList"></div><textarea id="editContent">'+cv+'</textarea><div style="margin-top:1rem;display:flex;gap:0.8rem;"><button class="btn" id="saveBtn">'+(isEdit?'保存':'发布')+'</button><button class="btn btn-secondary" id="cancelBtn">取消</button></div></div>';var ct=et.slice();function rt(){document.getElementById('tagList').innerHTML=ct.map(function(t){return '<span class="tag-chip">'+escapeHtml(t)+' <span class="remove-tag" data-tag="'+t+'">×</span></span>';}).join('');document.querySelectorAll('.remove-tag').forEach(function(b){b.addEventListener('click',function(){ct=ct.filter(function(t){return t!==this.getAttribute('data-tag');}.bind(this));rt();});});}rt();function at(){var ti=document.getElementById('tagInput');var t=ti.value.trim();if(t&&ct.indexOf(t)===-1){ct.push(t);rt();}ti.value='';}document.getElementById('addTagBtn').addEventListener('click',at);document.getElementById('tagInput').addEventListener('keypress',function(e){if(e.key==='Enter'){e.preventDefault();at();}});document.getElementById('saveBtn').addEventListener('click',function(){var title=document.getElementById('editTitle').value.trim();var content=document.getElementById('editContent').value.trim();var w=parseInt(document.getElementById('editWeight').value);if(!title||!content)return;var labels=[LABEL_PREFIX,'weight:'+w].concat(ct);if(isEdit){updatePost(num,title,content,labels);}else{publishPost(title,content,labels);}});document.getElementById('cancelBtn').addEventListener('click',function(){if(isEdit){showPost(num);}else{loadPosts();}});}
+    async function editPost(num){try{var issue=await proxyRequest('GET','/api/issues/'+num);showEditor(num,issue);}catch(e){}}
+    async function publishPost(t,c,l){try{await proxyRequest('POST','/admin/issues',{title:t,body:c,labels:l},true);showToast('发布成功','📤');loadPosts();}catch(e){}}
+    async function updatePost(n,t,c,l){try{await proxyRequest('PATCH','/admin/issues/'+n,{title:t,body:c,labels:l},true);showToast('已更新','💾');showPost(n);}catch(e){}}
+    async function deletePost(n,t){if(!confirm('删除「'+t+'」？'))return;try{await proxyRequest('PATCH','/admin/issues/'+n,{state:'closed'},true);showToast('已删除','🗑️');loadPosts();}catch(e){}}
+    async function loadProfile(){try{var issues=await proxyRequest('GET','/api/issues?state=all&labels='+PROFILE_LABEL+'&per_page=10');for(var i=0;i<issues.length;i++){if(issues[i].state==='open'&&issues[i].labels.some(function(l){return l.name===PROFILE_LABEL;})){try{profile=JSON.parse(issues[i].body);}catch(e){}break;}}}catch(e){}updateSidebarProfile();}
+    function updateSidebarProfile(){var a=document.getElementById('sidebarAvatar');var n=document.getElementById('sidebarName');var b=document.getElementById('sidebarBio');if(profile.avatar){a.style.backgroundImage='url('+profile.avatar+')';a.textContent='';}else{a.style.backgroundImage='';a.textContent='🧑‍💻';}n.textContent=profile.name;b.innerHTML=escapeHtml(profile.bio).replace(/\n/g,'<br>');}
+    function showProfile(){var el=document.getElementById('postList');el.innerHTML='<div class="profile-page"><div class="profile-banner" style="'+(profile.banner?'background-image:url('+profile.banner+')':'background:var(--banner-gradient)')+';"><div class="banner-overlay"></div></div><div class="profile-info"><div class="profile-avatar-large" style="'+(profile.avatar?'background-image:url('+profile.avatar+')':'')+'">'+(profile.avatar?'':'🧑‍💻')+'</div><div><div class="profile-name">'+escapeHtml(profile.name)+'</div><div style="color:var(--text-secondary);font-size:0.85rem;">OIer / 算法竞赛选手</div></div></div><div class="profile-bio">'+escapeHtml(profile.bio).replace(/\n/g,'<br>')+'</div><div style="padding:0 2rem 2rem;"><button class="btn btn-secondary" id="backFromProfile">← 返回首页</button></div></div>';document.getElementById('backFromProfile').addEventListener('click',loadPosts);}
+    function loginWithGitHub(){window.location.href=PROXY_URL+'/oauth/login';}
 
-    function updateReadingProgress() {
-      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-      var bar = document.getElementById('readingProgressBar');
-      var percentage = document.getElementById('readingProgressPercentage');
-      if (bar) bar.style.width = progress + '%';
-      if (percentage) {
-        percentage.textContent = Math.round(progress) + '%';
-        if (scrollTop > 100) { percentage.classList.add('visible'); } else { percentage.classList.remove('visible'); }
-      }
-      // 回到顶部按钮
-      var backToTopBtn = document.getElementById('backToTopBtn');
-      if (backToTopBtn) {
-        if (scrollTop > 300) { backToTopBtn.classList.add('visible'); } else { backToTopBtn.classList.remove('visible'); }
-      }
-    }
-
-    function initReadingProgress() {
-      window.addEventListener('scroll', updateReadingProgress);
-      window.addEventListener('resize', updateReadingProgress);
-      updateReadingProgress();
-    }
-
-    function initTheme() {
-      var savedTheme = localStorage.getItem('blog_theme');
-      var themeToggle = document.getElementById('themeToggle');
-      if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeToggle.textContent = '☀️';
-        document.getElementById('hljs-dark').disabled = true;
-        document.getElementById('hljs-light').disabled = false;
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.textContent = '🌙';
-        document.getElementById('hljs-dark').disabled = false;
-        document.getElementById('hljs-light').disabled = true;
-      }
-    }
-
-    function toggleTheme() {
-      var currentTheme = document.documentElement.getAttribute('data-theme');
-      var themeToggle = document.getElementById('themeToggle');
-      if (currentTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.textContent = '🌙';
-        localStorage.setItem('blog_theme', 'dark');
-        document.getElementById('hljs-dark').disabled = false;
-        document.getElementById('hljs-light').disabled = true;
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeToggle.textContent = '☀️';
-        localStorage.setItem('blog_theme', 'light');
-        document.getElementById('hljs-dark').disabled = true;
-        document.getElementById('hljs-light').disabled = false;
-      }
-    }
-
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function renderMarkdown(text) {
-      if (typeof marked === 'undefined') return escapeHtml(text).replace(/\n/g, '<br>');
-      const renderer = new marked.Renderer();
-      renderer.heading = function(text, level) {
-        var id = 'heading-' + text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substr(2, 5);
-        return '<h' + level + ' id="' + id + '">' + text + '</h' + level + '>';
-      };
-      renderer.code = function(code, language) {
-        let highlightedCode;
-        if (typeof hljs !== 'undefined') {
-          try {
-            if (language && hljs.getLanguage(language)) {
-              highlightedCode = hljs.highlight(code, { language: language, ignoreIllegals: true }).value;
-            } else {
-              highlightedCode = hljs.highlightAuto(code).value;
-            }
-          } catch (e) { highlightedCode = escapeHtml(code); }
-        } else { highlightedCode = escapeHtml(code); }
-        var langLabel = language ? '<span class="code-language-label">' + escapeHtml(language) + '</span>' : '';
-        return '<div class="code-block-wrapper">' +
-          langLabel +
-          '<button class="copy-code-btn" onclick="copyCode(this)">📋 复制</button>' +
-          '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
-          '</div>';
-      };
-      // 图片懒加载
-      renderer.image = function(href, title, text) {
-        return '<img src="' + href + '" alt="' + (text || '') + '" loading="lazy"' + (title ? ' title="' + title + '"' : '') + '>';
-      };
-      marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
-      return marked.parse(text);
-    }
-
-    function copyCode(btn) {
-      var codeBlock = btn.parentElement.querySelector('code');
-      var code = codeBlock ? codeBlock.textContent : '';
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(code).then(function() {
-          btn.textContent = '✅ 已复制';
-          setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
-        }).catch(function() { fallbackCopy(code, btn); });
-      } else { fallbackCopy(code, btn); }
-    }
-
-    function fallbackCopy(code, btn) {
-      var textarea = document.createElement('textarea');
-      textarea.value = code;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      btn.textContent = '✅ 已复制';
-      setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
-    }
-
-    function generateTOC(contentHTML) {
-      var headings = [];
-      var tempDiv = document.createElement('div');
-      tempDiv.innerHTML = contentHTML;
-      var headingElements = tempDiv.querySelectorAll('h1, h2, h3');
-      headingElements.forEach(function(heading) {
-        headings.push({ level: heading.tagName, text: heading.textContent, id: heading.id });
-      });
-      return headings;
-    }
-
-    function renderFloatingTOC(headings) {
-      var tocContainer = document.getElementById('sidebarTOC');
-      if (headings.length === 0) { tocContainer.classList.remove('visible'); tocContainer.innerHTML = ''; return; }
-      var tocHTML = '<div class="toc-card"><div class="toc-title">📑 目录</div>';
-      headings.forEach(function(heading) {
-        var indent = heading.level === 'H1' ? 0 : heading.level === 'H2' ? 1 : 2;
-        tocHTML += '<a href="#' + heading.id + '" class="toc-item" data-target="' + heading.id + '" style="padding-left:' + (indent * 15 + 8) + 'px;">' + escapeHtml(heading.text) + '</a>';
-      });
-      tocHTML += '</div>';
-      tocContainer.innerHTML = tocHTML;
-      tocContainer.classList.add('visible');
-      tocContainer.querySelectorAll('.toc-item').forEach(function(item) {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          var targetId = this.getAttribute('data-target');
-          var targetElement = document.getElementById(targetId);
-          if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            tocContainer.querySelectorAll('.toc-item').forEach(function(i) { i.classList.remove('active'); });
-            this.classList.add('active');
-          }
-        });
-      });
-    }
-
-    function hideTOC() {
-      var tocContainer = document.getElementById('sidebarTOC');
-      tocContainer.classList.remove('visible');
-      tocContainer.innerHTML = '';
-    }
-
-    function getWeightFromLabels(labels) {
-      if (!labels) return 2;
-      for (var i = 0; i < labels.length; i++) {
-        if (labels[i].name && labels[i].name.startsWith('weight:')) return parseInt(labels[i].name.replace('weight:', '')) || 2;
-      }
-      return 2;
-    }
-
-    function isPinned(issue) {
-      return getWeightFromLabels(issue.labels) >= 3;
-    }
-
-    function countWords(text) {
-      if (!text) return 0;
-      var cleanText = text.replace(/[#>*`\-\n\r\t]/g, '');
-      var chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
-      var englishWords = (cleanText.match(/[a-zA-Z0-9_]+/g) || []).length;
-      return chineseChars + englishWords;
-    }
-
-    function estimateReadTime(wordCount) {
-      var minutes = Math.ceil(wordCount / 300);
-      if (minutes < 1) return '不到 1 分钟';
-      return minutes + ' 分钟';
-    }
-
-    function loginWithGitHub() {
-      window.location.href = PROXY_URL + '/oauth/login';
-    }
-
-    function logoutGitHub() {
-      localStorage.removeItem('github_oauth_token');
-      showToast('已退出登录', '👋');
-      var currentIssueNumber = localStorage.getItem('current_issue_number');
-      if (currentIssueNumber) showPost(currentIssueNumber);
-    }
-
-    function isUserLoggedIn() {
-      return !!localStorage.getItem('github_oauth_token');
-    }
-
-    function getUserToken() {
-      return localStorage.getItem('github_oauth_token') || '';
-    }
-
-    async function loadComments(issueNumber) {
-      try { return await proxyRequest('GET', '/api/issues/' + issueNumber + '/comments'); }
-      catch (error) { return []; }
-    }
-
-    async function postComment(issueNumber, content) {
-      var userToken = getUserToken();
-      if (!userToken) { showToast('请先登录', '⚠️'); loginWithGitHub(); return false; }
-      try {
-        var url = PROXY_URL + '/api/issues/' + issueNumber + '/comments';
-        var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken };
-        var response = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify({ body: content }) });
-        if (!response.ok) throw new Error('评论失败');
-        return true;
-      } catch (error) { showToast('评论失败', '❌'); return false; }
-    }
-
-    function renderComments(comments) {
-      if (!comments || comments.length === 0) return '<div style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:1rem;">暂无评论</div>';
-      return comments.map(function(comment) {
-        var avatar = comment.user && comment.user.avatar_url ? comment.user.avatar_url : '';
-        var login = comment.user ? comment.user.login : '匿名';
-        return '<div class="comment-item">' +
-          '<div class="comment-header">' +
-          '<div class="comment-avatar" style="' + (avatar ? 'background-image:url(' + avatar + ')' : '') + '">' + (avatar ? '' : '👤') + '</div>' +
-          '<span class="comment-author">' + escapeHtml(login) + '</span>' +
-          '<span class="comment-date">' + new Date(comment.created_at).toLocaleDateString('zh-CN') + '</span>' +
-          '</div>' +
-          '<div class="comment-body">' + escapeHtml(comment.body || '') + '</div>' +
-          '</div>';
-      }).join('');
-    }
-
-    function updateSidebarProfile() {
-      var avatarEl = document.getElementById('sidebarAvatar');
-      var nameEl = document.getElementById('sidebarName');
-      var bioEl = document.getElementById('sidebarBio');
-      if (profile.avatar) { avatarEl.style.backgroundImage = 'url(' + profile.avatar + ')'; avatarEl.textContent = ''; }
-      else { avatarEl.style.backgroundImage = ''; avatarEl.textContent = '🧑‍💻'; }
-      nameEl.textContent = profile.name;
-      bioEl.innerHTML = escapeHtml(profile.bio).replace(/\n/g, '<br>');
-    }
-
-    async function proxyRequest(method, endpoint, body, useAdmin) {
-      var url = PROXY_URL + endpoint;
-      var headers = { 'Content-Type': 'application/json' };
-      if (useAdmin) headers['Authorization'] = 'Bearer ' + ADMIN_PASSWORD;
-      var options = { method: method, headers: headers };
-      if (body) options.body = JSON.stringify(body);
-      var response = await fetch(url, options);
-      if (!response.ok) throw new Error('API 错误');
-      return response.json();
-    }
-
-    async function loadProfile() {
-      try {
-        var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
-        var profileIssue = null;
-        for (var i = 0; i < issues.length; i++) {
-          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) { profileIssue = issues[i]; break; }
-        }
-        if (profileIssue && profileIssue.body) {
-          try { profile = JSON.parse(profileIssue.body); } catch (e) {}
-        }
-        updateSidebarProfile();
-      } catch (error) {}
-    }
-
-    async function saveProfileToGitHub() {
-      try {
-        var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
-        var profileIssue = null;
-        for (var i = 0; i < issues.length; i++) {
-          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) { profileIssue = issues[i]; break; }
-        }
-        var body = JSON.stringify(profile);
-        if (profileIssue) { await proxyRequest('PATCH', '/admin/issues/' + profileIssue.number, { body: body }, true); }
-        else { await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true); }
-        showToast('个人资料已保存', '✅');
-      } catch (error) {}
-    }
-
-    function showProfile() {
-      var listEl = document.getElementById('postList');
-      hideTOC();
-      var bioHtml = escapeHtml(profile.bio).replace(/\n/g, '<br>');
-      var editBtn = isAdmin ? '<button class="btn profile-edit-btn" id="editProfileBtn">✏️ 编辑资料</button>' : '';
-      listEl.innerHTML = '<div class="profile-page">' +
-        '<div class="profile-banner" style="' + (profile.banner ? 'background-image:url(' + profile.banner + ')' : 'background:var(--banner-gradient)') + ';">' +
-        '<div class="banner-overlay"></div>' + editBtn + '</div>' +
-        '<div class="profile-info">' +
-        '<div class="profile-avatar-large" style="' + (profile.avatar ? 'background-image:url(' + profile.avatar + ')' : '') + '">' + (profile.avatar ? '' : '🧑‍💻') + '</div>' +
-        '<div><div class="profile-name">' + escapeHtml(profile.name) + '</div></div></div>' +
-        '<div class="profile-bio">' + bioHtml + '</div>' +
-        '<div style="padding:0 2rem 2rem;">' +
-        '<button class="btn btn-secondary" id="backFromProfileBtn">← 返回首页</button></div></div>';
-      document.getElementById('backFromProfileBtn').addEventListener('click', loadPosts);
-      if (isAdmin) document.getElementById('editProfileBtn').addEventListener('click', showProfileEditor);
-    }
-
-    function showProfileEditor() {
-      var listEl = document.getElementById('postList');
-      listEl.innerHTML = '<div class="editor">' +
-        '<h2>✏️ 编辑个人资料</h2>' +
-        '<label>头像图片 URL</label>' +
-        '<input type="url" id="editAvatar" value="' + escapeHtml(profile.avatar) + '">' +
-        '<label>背景图片 URL</label>' +
-        '<input type="url" id="editBanner" value="' + escapeHtml(profile.banner) + '">' +
-        '<label>昵称</label>' +
-        '<input type="text" id="editName" value="' + escapeHtml(profile.name) + '">' +
-        '<label>个人介绍</label>' +
-        '<textarea id="editBio" style="min-height:120px;">' + escapeHtml(profile.bio) + '</textarea>' +
-        '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
-        '<button class="btn" id="saveProfileBtn">💾 保存</button>' +
-        '<button class="btn btn-secondary" id="cancelProfileEditBtn">取消</button></div></div>';
-      document.getElementById('saveProfileBtn').addEventListener('click', function() {
-        profile.avatar = document.getElementById('editAvatar').value.trim();
-        profile.banner = document.getElementById('editBanner').value.trim();
-        profile.name = document.getElementById('editName').value.trim() || 'Mirage_Rover';
-        profile.bio = document.getElementById('editBio').value.trim();
-        saveProfileToGitHub().then(function() { updateSidebarProfile(); showProfile(); });
-      });
-      document.getElementById('cancelProfileEditBtn').addEventListener('click', showProfile);
-    }
-
-    async function loadPosts() {
-      var listEl = document.getElementById('postList');
-      hideTOC();
-      listEl.innerHTML = '<div class="loading">加载中...</div>';
-      try {
-        var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
-        allPosts = issues.filter(function(issue) { return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; }); });
-        allPosts.sort(function(a, b) {
-          var wa = getWeightFromLabels(a.labels);
-          var wb = getWeightFromLabels(b.labels);
-          if (wb !== wa) return wb - wa;
-          return new Date(b.created_at) - new Date(a.created_at);
-        });
-        currentPage = 1;
-        renderPosts();
-        renderTagCloud();
-      } catch (error) { listEl.innerHTML = '<div class="error-msg">加载失败</div>'; }
-    }
-
-    function renderPosts() {
-      var listEl = document.getElementById('postList');
-      var filteredPosts = allPosts;
-      if (activeTag) { filteredPosts = filteredPosts.filter(function(issue) { return issue.labels.some(function(label) { return label.name === activeTag; }); }); }
-      if (searchQuery) { var q = searchQuery.toLowerCase(); filteredPosts = filteredPosts.filter(function(issue) { return issue.title.toLowerCase().includes(q) || (issue.body && issue.body.toLowerCase().includes(q)); }); }
-      totalPages = Math.ceil(filteredPosts.length / perPage);
-      if (currentPage > totalPages) currentPage = 1;
-      if (filteredPosts.length === 0) { listEl.innerHTML = '<div class="loading">暂无匹配文章</div>'; return; }
-      var startIndex = (currentPage - 1) * perPage;
-      var endIndex = Math.min(startIndex + perPage, filteredPosts.length);
-      var pagePosts = filteredPosts.slice(startIndex, endIndex);
-      listEl.innerHTML = pagePosts.map(function(issue) {
-        var weight = getWeightFromLabels(issue.labels);
-        var pinned = isPinned(issue);
-        var wordCount = countWords(issue.body || '');
-        var readTime = estimateReadTime(wordCount);
-        var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
-        var weightBadge = isAdmin ? '<span class="weight-badge">⚖️ ' + weight + '</span>' : '';
-        var pinnedBadge = pinned ? '<span class="pinned-badge">📌 置顶</span>' : '';
-        return '<article class="post-card' + (pinned ? ' pinned' : '') + '" data-issue="' + issue.number + '">' +
-          '<div class="post-meta">' +
-          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
-          weightBadge + pinnedBadge +
-          '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
-          '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
-          '</div>' +
-          '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
-          '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
-          (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
-          '</article>';
-      }).join('');
-      if (totalPages > 1) { listEl.innerHTML += '<div class="pagination">' + renderPagination() + '</div>'; }
-      document.querySelectorAll('.post-card').forEach(function(card) {
-        card.addEventListener('click', function(e) {
-          if (e.target.classList.contains('post-tag')) { e.stopPropagation(); activeTag = e.target.getAttribute('data-tag'); currentPage = 1; renderPosts(); renderTagCloud(); }
-          else { showPost(this.getAttribute('data-issue')); }
-        });
-      });
-    }
-
-    function renderPagination() {
-      var html = '';
-      if (currentPage > 1) { html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage - 1) + ')">←</button>'; }
-      for (var i = 1; i <= totalPages; i++) { html += '<button class="btn' + (i === currentPage ? '' : ' btn-secondary') + '" onclick="goToPage(' + i + ')">' + i + '</button>'; }
-      if (currentPage < totalPages) { html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage + 1) + ')">→</button>'; }
-      return html;
-    }
-
-    function goToPage(page) { currentPage = page; renderPosts(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-    function renderTagCloud() {
-      var tagCloud = document.getElementById('tagCloud');
-      var allTags = {};
-      allPosts.forEach(function(issue) {
-        issue.labels.forEach(function(label) {
-          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:')) {
-            if (!allTags[label.name]) allTags[label.name] = 0;
-            allTags[label.name]++;
-          }
-        });
-      });
-      var tagNames = Object.keys(allTags);
-      if (tagNames.length === 0) { tagCloud.innerHTML = '<span>暂无标签</span>'; return; }
-      tagCloud.innerHTML = tagNames.map(function(tag) { return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>'; }).join('');
-      tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
-        tag.addEventListener('click', function() { activeTag = this.getAttribute('data-tag'); currentPage = 1; renderPosts(); renderTagCloud(); });
-      });
-    }
-
-    async function showPost(issueNumber) {
-      var listEl = document.getElementById('postList');
-      localStorage.setItem('current_issue_number', issueNumber);
-      listEl.innerHTML = '<div class="loading">加载文章...</div>';
-      try {
-        var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
-        var rawContent = issue.body || '';
-        var content = renderMarkdown(rawContent);
-        var headings = generateTOC(content);
-        renderFloatingTOC(headings);
-        var wordCount = countWords(rawContent);
-        var readTime = estimateReadTime(wordCount);
-        var weight = getWeightFromLabels(issue.labels);
-        var pinned = isPinned(issue);
-        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
-        var adminButtons = isAdmin ? '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' + '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' + '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button>' + '<button class="btn btn-secondary" id="exportBtn">📤 导出</button></div>' : '';
-        
-        var comments = await loadComments(issueNumber);
-        var userLoggedIn = isUserLoggedIn();
-        
-        listEl.innerHTML = '<div class="post-detail">' +
-          '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
-          '<h1>' + escapeHtml(issue.title) + '</h1>' +
-          '<div class="post-meta" style="margin-bottom:1rem;">' +
-          '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
-          (pinned ? '<span class="pinned-badge">📌 置顶</span>' : '') +
-          '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
-          '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
-          (tags ? '<span>' + tags + '</span>' : '') +
-          '</div>' +
-          '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
-          adminButtons +
-          '<div class="comments-section">' +
-          '<div class="comments-title">💬 评论 (' + comments.length + ')</div>' +
-          '<div id="commentsList">' + renderComments(comments) + '</div>' +
-          '<div class="comment-input-area">' +
-          (userLoggedIn ? '<textarea id="commentInput" placeholder="发表评论..."></textarea>' : '') +
-          '<div style="margin-top:0.5rem;display:flex;gap:0.5rem;">' +
-          (userLoggedIn ? '<button class="btn" id="submitCommentBtn">💬 发表评论</button>' : '<button class="btn" id="loginBtn">🔑 使用 GitHub 登录</button>') +
-          '<a href="https://github.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/issues/' + issueNumber + '" target="_blank" style="font-size:0.8rem;color:var(--accent);text-decoration:none;">在 GitHub 上查看</a>' +
-          '</div></div></div></div>';
-        
-        document.getElementById('backBtn').addEventListener('click', loadPosts);
-        if (isAdmin) {
-          document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
-          document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
-          document.getElementById('exportBtn').addEventListener('click', function() { exportPost(issue); });
-        }
-        if (userLoggedIn) {
-          document.getElementById('submitCommentBtn').addEventListener('click', function() {
-            var commentInput = document.getElementById('commentInput');
-            var content = commentInput.value.trim();
-            if (!content) return;
-            postComment(issueNumber, content).then(function(success) {
-              if (success) {
-                commentInput.value = '';
-                showToast('评论发表成功！', '💬');
-                loadComments(issueNumber).then(function(newComments) {
-                  document.getElementById('commentsList').innerHTML = renderComments(newComments);
-                });
-              }
-            });
-          });
-        } else {
-          document.getElementById('loginBtn').addEventListener('click', loginWithGitHub);
-        }
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) { MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {}); }
-      } catch (error) { listEl.innerHTML = '<div class="error-msg">加载失败</div>'; }
-    }
-
-    // 导出文章
-    function exportPost(issue) {
-      var content = '# ' + issue.title + '\n\n';
-      content += '> 创建于 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '\n\n';
-      content += issue.body || '';
-      var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = issue.title.replace(/[^\w\u4e00-\u9fa5]/g, '_') + '.md';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('文章已导出', '📤');
-    }
-
-    function showPasswordModal() { 
-      document.getElementById('passwordModal').classList.add('active'); 
-      document.getElementById('passwordInput').value = ''; 
-      document.getElementById('passwordError').classList.remove('visible');
-      document.getElementById('passwordInput').focus(); 
-    }
-    function hidePasswordModal() { document.getElementById('passwordModal').classList.remove('active'); }
-    function verifyPassword() {
-      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) { 
-        isAdmin = true; 
-        hidePasswordModal(); 
-        showToast('管理员验证成功', '✅');
-        document.getElementById('adminBtn').textContent = '✏️ 写文章'; 
-        loadPosts(); 
-      } else { 
-        document.getElementById('passwordError').classList.add('visible');
-        document.getElementById('passwordInput').value = '';
-        document.getElementById('passwordInput').focus();
-      }
-    }
-
-    function showEditor(issueNumber, existingData) {
-      if (!isAdmin) { showPasswordModal(); return; }
-      var listEl = document.getElementById('postList');
-      hideTOC();
-      var isEdit = issueNumber !== null && issueNumber !== undefined;
-      var titleValue = existingData ? escapeHtml(existingData.title) : '';
-      var contentValue = existingData ? escapeHtml(existingData.body) : '';
-      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); }).map(function(l) { return l.name; }) : [];
-      var existingWeight = existingData ? getWeightFromLabels(existingData.labels) : 2;
-      listEl.innerHTML = '<div class="editor">' +
-        '<h2>' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
-        '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
-        '<div style="display:flex;gap:1rem;margin-bottom:1rem;">' +
-        '<label>⚖️ 权重：</label>' +
-        '<select id="editWeight">' +
-        '<option value="1"' + (existingWeight === 1 ? ' selected' : '') + '>1 - 置底</option>' +
-        '<option value="2"' + (existingWeight === 2 ? ' selected' : '') + '>2 - 默认</option>' +
-        '<option value="3"' + (existingWeight === 3 ? ' selected' : '') + '>3 - 置顶</option>' +
-        '<option value="4"' + (existingWeight === 4 ? ' selected' : '') + '>4 - 高优先级</option>' +
-        '<option value="5"' + (existingWeight === 5 ? ' selected' : '') + '>5 - 最高</option>' +
-        '</select></div>' +
-        '<div class="tag-input-row"><input type="text" id="tagInput" placeholder="添加标签"><button class="btn btn-secondary" id="addTagBtn">添加</button></div>' +
-        '<div class="tag-list" id="tagList"></div>' +
-        '<textarea id="editContent">' + contentValue + '</textarea>' +
-        '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
-        '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存' : '📤 发布') + '</button>' +
-        '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
-      var currentTags = existingTags.slice();
-      function renderTags() {
-        var tagList = document.getElementById('tagList');
-        tagList.innerHTML = currentTags.map(function(tag) { return '<span class="tag-chip">' + escapeHtml(tag) + ' <span class="remove-tag" data-tag="' + tag + '">×</span></span>'; }).join('');
-        tagList.querySelectorAll('.remove-tag').forEach(function(btn) {
-          btn.addEventListener('click', function() { currentTags = currentTags.filter(function(t) { return t !== this.getAttribute('data-tag'); }.bind(this)); renderTags(); });
-        });
-      }
-      renderTags();
-      function addTag() { var tagInput = document.getElementById('tagInput'); var tag = tagInput.value.trim(); if (tag && currentTags.indexOf(tag) === -1) { currentTags.push(tag); renderTags(); } tagInput.value = ''; tagInput.focus(); }
-      document.getElementById('addTagBtn').addEventListener('click', addTag);
-      document.getElementById('tagInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
-      document.getElementById('saveBtn').addEventListener('click', function() {
-        var title = document.getElementById('editTitle').value.trim();
-        var content = document.getElementById('editContent').value.trim();
-        var weight = parseInt(document.getElementById('editWeight').value);
-        if (!title || !content) return;
-        var labels = [LABEL_PREFIX, 'weight:' + weight].concat(currentTags);
-        if (isEdit) { updatePost(issueNumber, title, content, labels); } else { publishPost(title, content, labels); }
-      });
-      document.getElementById('cancelEditBtn').addEventListener('click', function() { if (isEdit) { showPost(issueNumber); } else { loadPosts(); } });
-    }
-
-    async function editPost(issueNumber) { try { var issue = await proxyRequest('GET', '/api/issues/' + issueNumber); showEditor(issueNumber, issue); } catch (error) {} }
-    async function publishPost(title, content, labels) { try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showToast('文章发布成功！', '📤'); loadPosts(); } catch (error) {} }
-    async function updatePost(issueNumber, title, content, labels) { try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showToast('文章已更新', '💾'); showPost(issueNumber); } catch (error) {} }
-    async function deletePost(issueNumber, issueTitle) { if (!confirm('确定删除？')) return; try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showToast('文章已删除', '🗑️'); loadPosts(); } catch (error) {} }
-
-    window.addEventListener('DOMContentLoaded', function() {
-      initTheme();
-      initReadingProgress();
-      updateSidebarProfile();
-      
-      var urlParams = new URLSearchParams(window.location.search);
-      var oauthToken = urlParams.get('oauth_token');
-      if (oauthToken) {
-        localStorage.setItem('github_oauth_token', oauthToken);
-        window.history.replaceState({}, document.title, window.location.pathname);
-        showToast('GitHub 登录成功！', '🔑');
-      }
-      
-      // 回到顶部
-      document.getElementById('backToTopBtn').addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-      
-      document.addEventListener('keydown', function(e) {
-        if (e.altKey && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); document.getElementById('searchInput').focus(); }
-        if (e.altKey && (e.key === 't' || e.key === 'T')) { e.preventDefault(); toggleTheme(); }
-        if (e.altKey && (e.key === 'h' || e.key === 'H')) { e.preventDefault(); activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); }
-        if (e.altKey && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); showProfile(); }
-        if (e.altKey && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); } }
-        if (e.key === 'Escape') { hidePasswordModal(); var backBtn = document.getElementById('backBtn'); if (backBtn) { loadPosts(); } }
-      });
-      
-      document.getElementById('shortcutToggle').addEventListener('click', function() {
-        document.getElementById('shortcutContent').classList.toggle('collapsed');
-        document.getElementById('shortcutArrow').classList.toggle('collapsed');
-      });
-      
-      document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
-      document.getElementById('logoBtn').addEventListener('click', function() { activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
-      document.getElementById('homeBtn').addEventListener('click', function(e) { e.preventDefault(); activeTag = null; searchQuery = ''; currentPage = 1; document.getElementById('searchInput').value = ''; loadPosts(); });
-      document.getElementById('adminBtn').addEventListener('click', function(e) { e.preventDefault(); if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); } });
-      document.getElementById('passwordConfirmBtn').addEventListener('click', verifyPassword);
-      document.getElementById('passwordCancelBtn').addEventListener('click', hidePasswordModal);
-      document.getElementById('passwordInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') verifyPassword(); });
-      document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); currentPage = 1; renderPosts(); });
-      document.getElementById('changelogToggle').addEventListener('click', function() { document.getElementById('changelogContent').classList.toggle('collapsed'); this.querySelector('.arrow').classList.toggle('collapsed'); });
-      document.getElementById('profileCard').addEventListener('click', showProfile);
-      loadProfile();
-      loadPosts();
+    window.addEventListener('DOMContentLoaded',function(){
+      initTheme();updateReadingProgress();window.addEventListener('scroll',updateReadingProgress);window.addEventListener('resize',updateReadingProgress);
+      document.getElementById('backToTopBtn').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+      document.getElementById('themeToggle').addEventListener('click',function(e){e.preventDefault();toggleTheme();});
+      document.getElementById('logoBtn').addEventListener('click',function(){activeTag=null;searchQuery='';currentPage=1;document.getElementById('searchInput').value='';loadPosts();});
+      document.getElementById('homeBtn').addEventListener('click',function(e){e.preventDefault();activeTag=null;searchQuery='';currentPage=1;document.getElementById('searchInput').value='';loadPosts();});
+      document.getElementById('adminBtn').addEventListener('click',function(e){e.preventDefault();if(isAdmin){showEditor(null,null);}else{showPasswordModal();}});
+      document.getElementById('passwordConfirmBtn').addEventListener('click',verifyPassword);
+      document.getElementById('passwordCancelBtn').addEventListener('click',hidePasswordModal);
+      document.getElementById('passwordInput').addEventListener('keypress',function(e){if(e.key==='Enter')verifyPassword();});
+      document.getElementById('searchInput').addEventListener('input',function(){searchQuery=this.value.trim();currentPage=1;renderPosts();});
+      document.getElementById('changelogToggle').addEventListener('click',function(){document.getElementById('changelogContent').classList.toggle('collapsed');this.querySelector('.arrow').classList.toggle('collapsed');});
+      document.getElementById('shortcutToggle').addEventListener('click',function(){document.getElementById('shortcutContent').classList.toggle('collapsed');document.getElementById('shortcutArrow').classList.toggle('collapsed');});
+      document.getElementById('profileCard').addEventListener('click',showProfile);
+      document.addEventListener('keydown',function(e){if(e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();document.getElementById('searchInput').focus();}if(e.altKey&&(e.key==='t'||e.key==='T')){e.preventDefault();toggleTheme();}if(e.altKey&&(e.key==='h'||e.key==='H')){e.preventDefault();activeTag=null;searchQuery='';currentPage=1;loadPosts();}if(e.altKey&&(e.key==='p'||e.key==='P')){e.preventDefault();showProfile();}if(e.altKey&&(e.key==='n'||e.key==='N')){e.preventDefault();if(isAdmin){showEditor(null,null);}else{showPasswordModal();}}if(e.key==='Escape'){hidePasswordModal();}});
+      loadProfile();loadPosts();
     });
   </script>
 </body>
