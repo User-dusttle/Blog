@@ -316,6 +316,8 @@
 
     .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
+    .shortcut-content { max-height: 200px; overflow-y: auto; transition: max-height 0.4s ease; }
+    .shortcut-content.collapsed { max-height: 0; overflow: hidden; }
     .shortcut-row {
       display: flex;
       justify-content: space-between;
@@ -683,19 +685,15 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.1.0</div>
+              <div class="changelog-version">v1.2.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 新增快捷键<br>
-                ⌨️ Ctrl+K 搜索<br>
-                🌙 Ctrl+Shift+T 切换主题<br>
-                🏠 Ctrl+Home 首页<br>
-                👤 Ctrl+Shift+P 个人主页<br>
-                ✏️ Ctrl+N 新文章
+                ✨ 快捷键改用 Alt 组合键<br>
+                📂 快捷键栏可折叠
               </div>
             </div>
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.9</div>
+              <div class="changelog-version">v1.1.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 新增阅读进度条
@@ -711,13 +709,13 @@
           </div>
         </div>
         <div class="sidebar-card">
-          <h3>⌨️ 快捷键</h3>
-          <div>
-            <div class="shortcut-row"><span>🔍 搜索</span><kbd>Ctrl+K</kbd></div>
-            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Ctrl+Shift+T</kbd></div>
-            <div class="shortcut-row"><span>🏠 首页</span><kbd>Ctrl+Home</kbd></div>
-            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Ctrl+Shift+P</kbd></div>
-            <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Ctrl+N</kbd></div>
+          <h3 id="shortcutToggle"><span class="arrow" id="shortcutArrow">▼</span> ⌨️ 快捷键</h3>
+          <div class="shortcut-content" id="shortcutContent">
+            <div class="shortcut-row"><span>🔍 搜索</span><kbd>Alt+K</kbd></div>
+            <div class="shortcut-row"><span>🌙 切换主题</span><kbd>Alt+T</kbd></div>
+            <div class="shortcut-row"><span>🏠 首页</span><kbd>Alt+H</kbd></div>
+            <div class="shortcut-row"><span>👤 个人主页</span><kbd>Alt+P</kbd></div>
+            <div class="shortcut-row"><span>✏️ 新文章</span><kbd>Alt+N</kbd></div>
             <div class="shortcut-row"><span>❌ 关闭/返回</span><kbd>Esc</kbd></div>
           </div>
         </div>
@@ -1351,24 +1349,24 @@
         showMessage('success', 'GitHub 登录成功！');
       }
       
-      // ==================== 快捷键 ====================
+      // ==================== 快捷键（Alt 组合键，不与浏览器冲突） ====================
       document.addEventListener('keydown', function(e) {
-        // Ctrl+K / Cmd+K - 聚焦搜索框
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        // Alt+K - 聚焦搜索框
+        if (e.altKey && (e.key === 'k' || e.key === 'K')) {
           e.preventDefault();
           document.getElementById('searchInput').focus();
           showMessage('success', '🔍 搜索模式');
         }
         
-        // Ctrl+Shift+T - 切换主题
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+        // Alt+T - 切换主题
+        if (e.altKey && (e.key === 't' || e.key === 'T')) {
           e.preventDefault();
           toggleTheme();
           showMessage('success', '主题已切换');
         }
         
-        // Ctrl+Home - 回到首页
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Home') {
+        // Alt+H - 回到首页
+        if (e.altKey && (e.key === 'h' || e.key === 'H')) {
           e.preventDefault();
           activeTag = null;
           searchQuery = '';
@@ -1377,16 +1375,16 @@
           loadPosts();
         }
         
-        // Ctrl+N / Cmd+N - 写新文章（管理员）
-        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-          e.preventDefault();
-          if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
-        }
-        
-        // Ctrl+Shift+P - 查看个人主页
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+        // Alt+P - 查看个人主页
+        if (e.altKey && (e.key === 'p' || e.key === 'P')) {
           e.preventDefault();
           showProfile();
+        }
+        
+        // Alt+N - 写新文章（管理员）
+        if (e.altKey && (e.key === 'n' || e.key === 'N')) {
+          e.preventDefault();
+          if (isAdmin) { showEditor(null, null); } else { showPasswordModal(); }
         }
         
         // Esc - 关闭弹窗或返回
@@ -1396,6 +1394,14 @@
           var backBtn = document.getElementById('backBtn');
           if (backBtn) { loadPosts(); }
         }
+      });
+      
+      // 快捷键折叠
+      document.getElementById('shortcutToggle').addEventListener('click', function() {
+        var content = document.getElementById('shortcutContent');
+        var arrow = document.getElementById('shortcutArrow');
+        content.classList.toggle('collapsed');
+        arrow.classList.toggle('collapsed');
       });
       
       document.getElementById('themeToggle').addEventListener('click', function(e) { e.preventDefault(); toggleTheme(); });
