@@ -620,19 +620,18 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.4</div>
+              <div class="changelog-version">v1.0.5</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 新增文章统计<br>
-                📊 字数/阅读时间/浏览量
+                ✨ 云端浏览量统计<br>
+                📝 代码块计入字数
               </div>
             </div>
             <div class="changelog-item">
-              <div class="changelog-version">v1.0.3</div>
+              <div class="changelog-version">v1.0.4</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 浮动TOC目录<br>
-                📄 分页功能
+                ✨ 新增文章统计
               </div>
             </div>
             <div class="changelog-item">
@@ -672,7 +671,6 @@
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
     const PROFILE_LABEL = 'profile-data';
-    const VIEW_LABEL = 'view-count';
     
     let isAdmin = false;
     let allPosts = [];
@@ -739,12 +737,10 @@
     function renderMarkdown(text) {
       if (typeof marked === 'undefined') return escapeHtml(text).replace(/\n/g, '<br>');
       const renderer = new marked.Renderer();
-      
       renderer.heading = function(text, level) {
         var id = 'heading-' + text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substr(2, 5);
         return '<h' + level + ' id="' + id + '">' + text + '</h' + level + '>';
       };
-      
       renderer.code = function(code, language) {
         let highlightedCode;
         if (typeof hljs !== 'undefined') {
@@ -761,7 +757,6 @@
           '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
           '</div>';
       };
-      
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
       return marked.parse(text);
     }
@@ -796,24 +791,15 @@
       tempDiv.innerHTML = contentHTML;
       var headingElements = tempDiv.querySelectorAll('h1, h2, h3');
       headingElements.forEach(function(heading) {
-        headings.push({
-          level: heading.tagName,
-          text: heading.textContent,
-          id: heading.id
-        });
+        headings.push({ level: heading.tagName, text: heading.textContent, id: heading.id });
       });
       return headings;
     }
 
     function renderFloatingTOC(headings) {
       var tocContainer = document.getElementById('sidebarTOC');
-      if (headings.length === 0) {
-        tocContainer.classList.remove('visible');
-        tocContainer.innerHTML = '';
-        return;
-      }
-      var tocHTML = '<div class="toc-card">';
-      tocHTML += '<div class="toc-title">📑 目录</div>';
+      if (headings.length === 0) { tocContainer.classList.remove('visible'); tocContainer.innerHTML = ''; return; }
+      var tocHTML = '<div class="toc-card"><div class="toc-title">📑 目录</div>';
       headings.forEach(function(heading) {
         var indent = heading.level === 'H1' ? 0 : heading.level === 'H2' ? 1 : 2;
         tocHTML += '<a href="#' + heading.id + '" class="toc-item" data-target="' + heading.id + '" style="padding-left:' + (indent * 15 + 8) + 'px;">' + escapeHtml(heading.text) + '</a>';
@@ -821,7 +807,6 @@
       tocHTML += '</div>';
       tocContainer.innerHTML = tocHTML;
       tocContainer.classList.add('visible');
-      
       tocContainer.querySelectorAll('.toc-item').forEach(function(item) {
         item.addEventListener('click', function(e) {
           e.preventDefault();
@@ -852,12 +837,21 @@
       return 2;
     }
 
-    // ==================== 文章统计 ====================
+    function getViewCountFromLabels(labels) {
+      if (!labels) return 0;
+      for (var i = 0; i < labels.length; i++) {
+        if (labels[i].name && labels[i].name.startsWith('views:')) {
+          return parseInt(labels[i].name.replace('views:', '')) || 0;
+        }
+      }
+      return 0;
+    }
+
     function countWords(text) {
       if (!text) return 0;
-      var cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/[#>*`\-\n\r\t]/g, '');
+      var cleanText = text.replace(/[#>*`\-\n\r\t]/g, '');
       var chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
-      var englishWords = (cleanText.match(/[a-zA-Z0-9]+/g) || []).length;
+      var englishWords = (cleanText.match(/[a-zA-Z0-9_]+/g) || []).length;
       return chineseChars + englishWords;
     }
 
@@ -867,26 +861,19 @@
       return minutes + ' 分钟';
     }
 
-    // 浏览量存储（localStorage 模拟数据库，同一 IP 不重复计数）
-    function getViewCount(issueNumber) {
-      var views = JSON.parse(localStorage.getItem('blog_views') || '{}');
-      return views[issueNumber] || 0;
-    }
-
-    function incrementViewCount(issueNumber) {
-      var views = JSON.parse(localStorage.getItem('blog_views') || '{}');
-      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
-      
-      // 同一 IP（浏览器）不重复计数
-      if (viewedPosts[issueNumber]) {
-        return views[issueNumber] || 0;
+    async function incrementViewCount(issue) {
+      var currentViews = getViewCountFromLabels(issue.labels);
+      var newViews = currentViews + 1;
+      var newLabels = issue.labels
+        .filter(function(l) { return !l.name.startsWith('views:'); })
+        .map(function(l) { return l.name; });
+      newLabels.push('views:' + newViews);
+      try {
+        await proxyRequest('PATCH', '/api/issues/' + issue.number, { labels: newLabels });
+      } catch (e) {
+        console.log('更新浏览量失败:', e);
       }
-      
-      views[issueNumber] = (views[issueNumber] || 0) + 1;
-      viewedPosts[issueNumber] = true;
-      localStorage.setItem('blog_views', JSON.stringify(views));
-      localStorage.setItem('blog_viewed_posts', JSON.stringify(viewedPosts));
-      return views[issueNumber];
+      return newViews;
     }
 
     function updateSidebarProfile() {
@@ -929,16 +916,10 @@
           }
         }
         if (profileIssue && profileIssue.body) {
-          try {
-            var parsed = JSON.parse(profileIssue.body);
-            if (parsed && typeof parsed === 'object') profile = parsed;
-          } catch (e) {}
+          try { var parsed = JSON.parse(profileIssue.body); if (parsed && typeof parsed === 'object') profile = parsed; } catch (e) {}
         }
         updateSidebarProfile();
-      } catch (error) {
-        console.log('加载个人资料失败:', error);
-        updateSidebarProfile();
-      }
+      } catch (error) { console.log('加载个人资料失败:', error); updateSidebarProfile(); }
     }
 
     async function saveProfileToGitHub() {
@@ -946,21 +927,13 @@
         var issues = await proxyRequest('GET', '/api/issues?state=all&labels=' + PROFILE_LABEL + '&per_page=10');
         var profileIssue = null;
         for (var i = 0; i < issues.length; i++) {
-          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) {
-            profileIssue = issues[i];
-            break;
-          }
+          if (issues[i].state === 'open' && issues[i].labels.some(function(l) { return l.name === PROFILE_LABEL; })) { profileIssue = issues[i]; break; }
         }
         var body = JSON.stringify(profile);
-        if (profileIssue) {
-          await proxyRequest('PATCH', '/admin/issues/' + profileIssue.number, { body: body }, true);
-        } else {
-          await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true);
-        }
+        if (profileIssue) { await proxyRequest('PATCH', '/admin/issues/' + profileIssue.number, { body: body }, true); }
+        else { await proxyRequest('POST', '/admin/issues', { title: 'Profile Data', body: body, labels: [PROFILE_LABEL] }, true); }
         showMessage('success', '个人资料已保存');
-      } catch (error) {
-        showMessage('error', '保存失败: ' + error.message);
-      }
+      } catch (error) { showMessage('error', '保存失败: ' + error.message); }
     }
 
     function showProfile() {
@@ -1002,10 +975,7 @@
         profile.banner = document.getElementById('editBanner').value.trim();
         profile.name = document.getElementById('editName').value.trim() || 'Mirage_Rover';
         profile.bio = document.getElementById('editBio').value.trim();
-        saveProfileToGitHub().then(function() {
-          updateSidebarProfile();
-          showProfile();
-        });
+        saveProfileToGitHub().then(function() { updateSidebarProfile(); showProfile(); });
       });
       document.getElementById('cancelProfileEditBtn').addEventListener('click', showProfile);
     }
@@ -1028,49 +998,28 @@
         currentPage = 1;
         renderPosts();
         renderTagCloud();
-      } catch (error) {
-        listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
-      }
+      } catch (error) { listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>'; }
     }
 
     function renderPosts() {
       var listEl = document.getElementById('postList');
       var filteredPosts = allPosts;
-      if (activeTag) {
-        filteredPosts = filteredPosts.filter(function(issue) {
-          return issue.labels.some(function(label) { return label.name === activeTag; });
-        });
-      }
-      if (searchQuery) {
-        var q = searchQuery.toLowerCase();
-        filteredPosts = filteredPosts.filter(function(issue) {
-          return issue.title.toLowerCase().includes(q) || (issue.body && issue.body.toLowerCase().includes(q));
-        });
-      }
-      
+      if (activeTag) { filteredPosts = filteredPosts.filter(function(issue) { return issue.labels.some(function(label) { return label.name === activeTag; }); }); }
+      if (searchQuery) { var q = searchQuery.toLowerCase(); filteredPosts = filteredPosts.filter(function(issue) { return issue.title.toLowerCase().includes(q) || (issue.body && issue.body.toLowerCase().includes(q)); }); }
       totalPages = Math.ceil(filteredPosts.length / perPage);
       if (currentPage > totalPages) currentPage = 1;
       if (currentPage < 1) currentPage = 1;
-      
-      if (filteredPosts.length === 0) {
-        listEl.innerHTML = '<div class="loading">暂无匹配文章</div>';
-        return;
-      }
-      
+      if (filteredPosts.length === 0) { listEl.innerHTML = '<div class="loading">暂无匹配文章</div>'; return; }
       var startIndex = (currentPage - 1) * perPage;
       var endIndex = Math.min(startIndex + perPage, filteredPosts.length);
       var pagePosts = filteredPosts.slice(startIndex, endIndex);
-      
       listEl.innerHTML = pagePosts.map(function(issue) {
         var weight = getWeightFromLabels(issue.labels);
+        var views = getViewCountFromLabels(issue.labels);
         var wordCount = countWords(issue.body || '');
         var readTime = estimateReadTime(wordCount);
-        var views = getViewCount(issue.number);
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
-        var tags = issue.labels
-          .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
-          .map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; })
-          .join('');
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag" data-tag="' + l.name + '">' + escapeHtml(l.name) + '</span>'; }).join('');
         var weightBadge = isAdmin ? '<span class="weight-badge">⚖️ ' + weight + '</span>' : '';
         return '<article class="post-card" data-issue="' + issue.number + '">' +
           '<div class="post-meta">' +
@@ -1085,76 +1034,41 @@
           (tags ? '<div class="post-meta" style="margin-top:0.5rem;">' + tags + '</div>' : '') +
           '</article>';
       }).join('');
-      
-      if (totalPages > 1) {
-        listEl.innerHTML += '<div class="pagination">' + renderPagination() + '</div>';
-      }
-      
+      if (totalPages > 1) { listEl.innerHTML += '<div class="pagination">' + renderPagination() + '</div>'; }
       document.querySelectorAll('.post-card').forEach(function(card) {
         card.addEventListener('click', function(e) {
-          if (e.target.classList.contains('post-tag')) {
-            e.stopPropagation();
-            activeTag = e.target.getAttribute('data-tag');
-            currentPage = 1;
-            renderPosts();
-            renderTagCloud();
-          } else {
-            showPost(this.getAttribute('data-issue'));
-          }
+          if (e.target.classList.contains('post-tag')) { e.stopPropagation(); activeTag = e.target.getAttribute('data-tag'); currentPage = 1; renderPosts(); renderTagCloud(); }
+          else { showPost(this.getAttribute('data-issue')); }
         });
       });
     }
 
     function renderPagination() {
       var html = '';
-      if (currentPage > 1) {
-        html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage - 1) + ')">← 上一页</button>';
-      }
-      for (var i = 1; i <= totalPages; i++) {
-        if (i === currentPage) {
-          html += '<button class="btn" onclick="goToPage(' + i + ')">' + i + '</button>';
-        } else {
-          html += '<button class="btn btn-secondary" onclick="goToPage(' + i + ')">' + i + '</button>';
-        }
-      }
-      if (currentPage < totalPages) {
-        html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage + 1) + ')">下一页 →</button>';
-      }
+      if (currentPage > 1) { html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage - 1) + ')">← 上一页</button>'; }
+      for (var i = 1; i <= totalPages; i++) { html += '<button class="btn' + (i === currentPage ? '' : ' btn-secondary') + '" onclick="goToPage(' + i + ')">' + i + '</button>'; }
+      if (currentPage < totalPages) { html += '<button class="btn btn-secondary" onclick="goToPage(' + (currentPage + 1) + ')">下一页 →</button>'; }
       return html;
     }
 
-    function goToPage(page) {
-      currentPage = page;
-      renderPosts();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    function goToPage(page) { currentPage = page; renderPosts(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
     function renderTagCloud() {
       var tagCloud = document.getElementById('tagCloud');
       var allTags = {};
       allPosts.forEach(function(issue) {
         issue.labels.forEach(function(label) {
-          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:')) {
+          if (label.name !== LABEL_PREFIX && !label.name.startsWith('weight:') && !label.name.startsWith('views:')) {
             if (!allTags[label.name]) allTags[label.name] = 0;
             allTags[label.name]++;
           }
         });
       });
       var tagNames = Object.keys(allTags);
-      if (tagNames.length === 0) {
-        tagCloud.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">暂无标签</span>';
-        return;
-      }
-      tagCloud.innerHTML = tagNames.map(function(tag) {
-        return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#ffffff;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>';
-      }).join('');
+      if (tagNames.length === 0) { tagCloud.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">暂无标签</span>'; return; }
+      tagCloud.innerHTML = tagNames.map(function(tag) { return '<span class="post-tag" data-tag="' + tag + '" style="cursor:pointer;' + (activeTag === tag ? 'background:var(--accent);color:#ffffff;' : '') + '">' + escapeHtml(tag) + ' (' + allTags[tag] + ')</span>'; }).join('');
       tagCloud.querySelectorAll('.post-tag').forEach(function(tag) {
-        tag.addEventListener('click', function() {
-          activeTag = this.getAttribute('data-tag');
-          currentPage = 1;
-          renderPosts();
-          renderTagCloud();
-        });
+        tag.addEventListener('click', function() { activeTag = this.getAttribute('data-tag'); currentPage = 1; renderPosts(); renderTagCloud(); });
       });
     }
 
@@ -1167,22 +1081,13 @@
         var content = renderMarkdown(rawContent);
         var headings = generateTOC(content);
         renderFloatingTOC(headings);
-        
-        // 文章统计
+        var views = await incrementViewCount(issue);
         var wordCount = countWords(rawContent);
         var readTime = estimateReadTime(wordCount);
-        var views = incrementViewCount(issueNumber);
-        
         var weight = getWeightFromLabels(issue.labels);
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
-        var tags = issue.labels
-          .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
-          .map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; })
-          .join(' ');
-        var adminButtons = isAdmin ? 
-          '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' +
-          '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' +
-          '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
+        var tags = issue.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return '<span class="post-tag">' + escapeHtml(l.name) + '</span>'; }).join(' ');
+        var adminButtons = isAdmin ? '<div style="margin-top:2rem;display:flex;gap:0.8rem;">' + '<button class="btn btn-secondary" id="editBtn">✏️ 编辑</button>' + '<button class="btn btn-danger" id="deleteBtn">🗑️ 删除</button></div>' : '';
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
@@ -1196,35 +1101,20 @@
           '</div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
           adminButtons + '</div>';
-        document.getElementById('backBtn').addEventListener('click', function() {
-          loadPosts();
-        });
+        document.getElementById('backBtn').addEventListener('click', function() { loadPosts(); });
         if (isAdmin) {
           document.getElementById('editBtn').addEventListener('click', function() { editPost(issueNumber); });
           document.getElementById('deleteBtn').addEventListener('click', function() { deletePost(issueNumber, issue.title); });
         }
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-          MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {});
-        }
-      } catch (error) {
-        listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>';
-      }
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) { MathJax.typesetPromise([document.getElementById('markdownContent')]).catch(function() {}); }
+      } catch (error) { listEl.innerHTML = '<div class="error-msg">' + escapeHtml(error.message) + '</div>'; }
     }
 
-    function showPasswordModal() {
-      document.getElementById('passwordModal').classList.add('active');
-      document.getElementById('passwordInput').value = '';
-      document.getElementById('passwordInput').focus();
-    }
+    function showPasswordModal() { document.getElementById('passwordModal').classList.add('active'); document.getElementById('passwordInput').value = ''; document.getElementById('passwordInput').focus(); }
     function hidePasswordModal() { document.getElementById('passwordModal').classList.remove('active'); }
     function verifyPassword() {
-      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
-        isAdmin = true;
-        hidePasswordModal();
-        showMessage('success', '管理员验证成功');
-        document.getElementById('adminBtn').textContent = '✏️ 写文章';
-        loadPosts();
-      } else { showMessage('error', '密码错误'); }
+      if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) { isAdmin = true; hidePasswordModal(); showMessage('success', '管理员验证成功'); document.getElementById('adminBtn').textContent = '✏️ 写文章'; loadPosts(); }
+      else { showMessage('error', '密码错误'); }
     }
 
     function showEditor(issueNumber, existingData) {
@@ -1234,11 +1124,8 @@
       var isEdit = issueNumber !== null && issueNumber !== undefined;
       var titleValue = existingData ? escapeHtml(existingData.title) : '';
       var contentValue = existingData ? escapeHtml(existingData.body) : '';
-      var existingTags = existingData ? existingData.labels
-        .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
-        .map(function(l) { return l.name; }) : [];
+      var existingTags = existingData ? existingData.labels.filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:') && !l.name.startsWith('views:'); }).map(function(l) { return l.name; }) : [];
       var existingWeight = existingData ? getWeightFromLabels(existingData.labels) : 2;
-      
       listEl.innerHTML = '<div class="editor">' +
         '<h2 style="margin-bottom:1rem;">' + (isEdit ? '✏️ 编辑文章' : '✏️ 撰写新文章') + '</h2>' +
         '<input type="text" id="editTitle" placeholder="文章标题" value="' + titleValue + '">' +
@@ -1250,36 +1137,23 @@
         '<option value="3"' + (existingWeight === 3 ? ' selected' : '') + '>3 - 置顶</option>' +
         '<option value="4"' + (existingWeight === 4 ? ' selected' : '') + '>4 - 高优先级</option>' +
         '<option value="5"' + (existingWeight === 5 ? ' selected' : '') + '>5 - 最高</option>' +
-        '</select>' +
-        '</div>' +
+        '</select></div>' +
         '<div class="tag-input-row"><input type="text" id="tagInput" placeholder="添加标签"><button class="btn btn-secondary" id="addTagBtn">添加</button></div>' +
         '<div class="tag-list" id="tagList"></div>' +
         '<textarea id="editContent" placeholder="支持 Markdown 和 LaTeX 公式">' + contentValue + '</textarea>' +
         '<div style="margin-top:1rem;display:flex;gap:0.8rem;">' +
         '<button class="btn" id="saveBtn">' + (isEdit ? '💾 保存' : '📤 发布') + '</button>' +
         '<button class="btn btn-secondary" id="cancelEditBtn">取消</button></div></div>';
-      
       var currentTags = existingTags.slice();
       function renderTags() {
         var tagList = document.getElementById('tagList');
-        tagList.innerHTML = currentTags.map(function(tag) {
-          return '<span class="tag-chip">' + escapeHtml(tag) + ' <span class="remove-tag" data-tag="' + tag + '">×</span></span>';
-        }).join('');
+        tagList.innerHTML = currentTags.map(function(tag) { return '<span class="tag-chip">' + escapeHtml(tag) + ' <span class="remove-tag" data-tag="' + tag + '">×</span></span>'; }).join('');
         tagList.querySelectorAll('.remove-tag').forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            var tagToRemove = this.getAttribute('data-tag');
-            currentTags = currentTags.filter(function(t) { return t !== tagToRemove; });
-            renderTags();
-          });
+          btn.addEventListener('click', function() { var tagToRemove = this.getAttribute('data-tag'); currentTags = currentTags.filter(function(t) { return t !== tagToRemove; }); renderTags(); });
         });
       }
       renderTags();
-      function addTag() {
-        var tagInput = document.getElementById('tagInput');
-        var tag = tagInput.value.trim();
-        if (tag && currentTags.indexOf(tag) === -1) { currentTags.push(tag); renderTags(); }
-        tagInput.value = ''; tagInput.focus();
-      }
+      function addTag() { var tagInput = document.getElementById('tagInput'); var tag = tagInput.value.trim(); if (tag && currentTags.indexOf(tag) === -1) { currentTags.push(tag); renderTags(); } tagInput.value = ''; tagInput.focus(); }
       document.getElementById('addTagBtn').addEventListener('click', addTag);
       document.getElementById('tagInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
       document.getElementById('saveBtn').addEventListener('click', function() {
@@ -1293,25 +1167,10 @@
       document.getElementById('cancelEditBtn').addEventListener('click', function() { if (isEdit) { showPost(issueNumber); } else { loadPosts(); } });
     }
 
-    async function editPost(issueNumber) {
-      try { var issue = await proxyRequest('GET', '/api/issues/' + issueNumber); showEditor(issueNumber, issue); }
-      catch (error) { showMessage('error', error.message); }
-    }
-    async function publishPost(title, content, labels) {
-      try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showMessage('success', '文章发布成功！'); loadPosts(); }
-      catch (error) { showMessage('error', '发布失败: ' + error.message); }
-    }
-    async function updatePost(issueNumber, title, content, labels) {
-      try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showMessage('success', '文章已更新'); showPost(issueNumber); }
-      catch (error) { showMessage('error', '更新失败: ' + error.message); }
-    }
-    async function deletePost(issueNumber, issueTitle) {
-      if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return;
-      var listEl = document.getElementById('postList');
-      listEl.innerHTML = '<div class="loading">正在删除...</div>';
-      try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showMessage('success', '文章已删除'); loadPosts(); }
-      catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); }
-    }
+    async function editPost(issueNumber) { try { var issue = await proxyRequest('GET', '/api/issues/' + issueNumber); showEditor(issueNumber, issue); } catch (error) { showMessage('error', error.message); } }
+    async function publishPost(title, content, labels) { try { await proxyRequest('POST', '/admin/issues', { title: title, body: content, labels: labels }, true); showMessage('success', '文章发布成功！'); loadPosts(); } catch (error) { showMessage('error', '发布失败: ' + error.message); } }
+    async function updatePost(issueNumber, title, content, labels) { try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { title: title, body: content, labels: labels }, true); showMessage('success', '文章已更新'); showPost(issueNumber); } catch (error) { showMessage('error', '更新失败: ' + error.message); } }
+    async function deletePost(issueNumber, issueTitle) { if (!confirm('确定要删除文章「' + issueTitle + '」吗？')) return; var listEl = document.getElementById('postList'); listEl.innerHTML = '<div class="loading">正在删除...</div>'; try { await proxyRequest('PATCH', '/admin/issues/' + issueNumber, { state: 'closed' }, true); showMessage('success', '文章已删除'); loadPosts(); } catch (error) { showMessage('error', '删除失败: ' + error.message); loadPosts(); } }
 
     window.addEventListener('DOMContentLoaded', function() {
       initTheme();
@@ -1324,12 +1183,7 @@
       document.getElementById('passwordCancelBtn').addEventListener('click', hidePasswordModal);
       document.getElementById('passwordInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') verifyPassword(); });
       document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); currentPage = 1; renderPosts(); });
-      document.getElementById('changelogToggle').addEventListener('click', function() {
-        var content = document.getElementById('changelogContent');
-        var arrow = this.querySelector('.arrow');
-        content.classList.toggle('collapsed');
-        arrow.classList.toggle('collapsed');
-      });
+      document.getElementById('changelogToggle').addEventListener('click', function() { var content = document.getElementById('changelogContent'); var arrow = this.querySelector('.arrow'); content.classList.toggle('collapsed'); arrow.classList.toggle('collapsed'); });
       document.getElementById('profileCard').addEventListener('click', showProfile);
       loadProfile();
       loadPosts();
