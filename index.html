@@ -45,6 +45,13 @@
       --gold-soft: #3a2f1e;
       --link-color: #7cb8ff;
       --link-hover: #a8d0ff;
+      /* 亮色模式代码标签专用变量 */
+      --code-label-bg: rgba(0, 0, 0, 0.55);
+      --code-label-color: #d4dcec;
+      --code-btn-bg: rgba(20, 30, 45, 0.6);
+      --code-btn-color: #b0c4de;
+      --code-btn-hover-bg: #4f9cf7;
+      --code-btn-hover-color: #ffffff;
     }
 
     :root[data-theme="light"] {
@@ -73,6 +80,13 @@
       --gold-soft: #fef3c7;
       --link-color: #2b6cb0;
       --link-hover: #2c5282;
+      /* 亮色模式专用：更清爽的标签与按钮 */
+      --code-label-bg: rgba(255, 255, 255, 0.85);
+      --code-label-color: #1a202c;
+      --code-btn-bg: rgba(255, 255, 255, 0.85);
+      --code-btn-color: #2d3748;
+      --code-btn-hover-bg: #3182ce;
+      --code-btn-hover-color: #ffffff;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -197,6 +211,14 @@
     @keyframes shimmer {
       0% { background-position: -200% center; }
       100% { background-position: 200% center; }
+    }
+    /* 文章内容淡入动效 */
+    @keyframes contentFadeIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .post-detail {
+      animation: contentFadeIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
     .shimmer-text {
       background: linear-gradient(90deg, var(--accent), var(--green), var(--accent));
@@ -373,7 +395,7 @@
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* 代码块 —— 语言标签与复制按钮 悬浮淡入淡出 */
+    /* 代码块 —— 悬浮淡入淡出，亮色模式优化 */
     .code-block-wrapper {
       position: relative;
       margin: 1.2rem 0;
@@ -382,7 +404,7 @@
       background: var(--code-bg);
       transition: box-shadow 0.3s ease;
     }
-    .code-block-wrapper:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    .code-block-wrapper:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
     .code-block-wrapper pre {
       margin: 0;
       padding: 1.2rem 1rem 1rem;
@@ -398,15 +420,15 @@
       position: absolute;
       top: 0.5rem;
       left: 0.7rem;
-      background: rgba(0, 0, 0, 0.6);
+      background: var(--code-label-bg);
       backdrop-filter: blur(6px);
-      color: #d4dcec;
+      color: var(--code-label-color);
       font-size: 0.65rem;
       font-weight: 600;
       padding: 0.15rem 0.8rem;
       border-radius: 20px;
       letter-spacing: 0.3px;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(128, 128, 128, 0.15);
       z-index: 5;
       user-select: none;
       pointer-events: none;
@@ -423,10 +445,10 @@
       position: absolute;
       top: 0.5rem;
       right: 0.7rem;
-      background: rgba(30, 40, 55, 0.6);
+      background: var(--code-btn-bg);
       backdrop-filter: blur(6px);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--code-btn-color);
+      border: 1px solid rgba(128, 128, 128, 0.15);
       border-radius: 20px;
       padding: 0.15rem 0.8rem;
       font-size: 0.65rem;
@@ -442,9 +464,9 @@
       transform: translateY(0);
     }
     .copy-code-btn:hover {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
+      background: var(--code-btn-hover-bg);
+      color: var(--code-btn-hover-color);
+      border-color: var(--code-btn-hover-bg);
       transform: translateY(-2px) scale(1.05);
     }
     /* 美化超链接 */
@@ -734,11 +756,19 @@
     .author-name { font-weight: 700; font-size: 1.2rem; color: var(--text); }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    .changelog { max-height: 300px; overflow-y: auto; transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+    /* 更新日志——去掉内部动效，只保留展开/收起过渡 */
+    .changelog {
+      max-height: 300px;
+      overflow-y: auto;
+      transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
     .changelog.collapsed { max-height: 0; overflow: hidden; }
-    .changelog-item { padding: 0.8rem 0; border-bottom: 1px dashed var(--border); transition: background 0.2s ease; }
+    .changelog-item {
+      padding: 0.8rem 0;
+      border-bottom: 1px dashed var(--border);
+      /* 移除 hover 背景和位移，保持干净 */
+    }
     .changelog-item:last-child { border-bottom: none; }
-    .changelog-item:hover { background: var(--surface-hover); border-radius: 6px; padding-left: 0.5rem; }
     .changelog-version { font-weight: 600; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.3rem; }
     .changelog-date { font-size: 0.75rem; color: var(--text-secondary); }
     .changelog-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
@@ -872,14 +902,13 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.4.0</div>
+              <div class="changelog-version">v1.5.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 代码标签与复制按钮悬浮淡入淡出<br>
-                🎨 丰富交互动效 (悬浮、弹跳、渐变)<br>
-                📌 置顶文章发光动画<br>
-                🖼️ 图片懒加载<br>
-                📤 文章导出功能<br>
+                ✨ 亮色模式代码标签与按钮风格优化<br>
+                🎬 文章内容加载淡入动效<br>
+                📝 复制按钮文字改为 "Copy"<br>
+                🧹 更新日志去除内部动效<br>
                 🔗 超链接下划线动效
               </div>
             </div>
@@ -1044,7 +1073,7 @@
         var langLabel = language ? '<span class="code-language-label">' + escapeHtml(language) + '</span>' : '';
         return '<div class="code-block-wrapper">' +
           langLabel +
-          '<button class="copy-code-btn" onclick="copyCode(this)">📋 复制</button>' +
+          '<button class="copy-code-btn" onclick="copyCode(this)">Copy</button>' +
           '<pre><code class="hljs language-' + escapeHtml(language || '') + '">' + highlightedCode + '</code></pre>' +
           '</div>';
       };
@@ -1063,8 +1092,8 @@
       var code = codeBlock ? codeBlock.textContent : '';
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(function() {
-          btn.textContent = '✅ 已复制';
-          setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+          btn.textContent = '✓ Done';
+          setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
         }).catch(function() { fallbackCopy(code, btn); });
       } else { fallbackCopy(code, btn); }
     }
@@ -1078,8 +1107,8 @@
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      btn.textContent = '✅ 已复制';
-      setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+      btn.textContent = '✓ Done';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
     }
 
     function generateTOC(contentHTML) {
@@ -1396,6 +1425,7 @@
         var comments = await loadComments(issueNumber);
         var userLoggedIn = isUserLoggedIn();
         
+        // 使用 post-detail 类触发淡入动效
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
