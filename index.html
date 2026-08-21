@@ -45,13 +45,15 @@
       --gold-soft: #3a2f1e;
       --link-color: #7cb8ff;
       --link-hover: #a8d0ff;
-      /* 亮色模式代码标签专用变量 */
       --code-label-bg: rgba(0, 0, 0, 0.55);
       --code-label-color: #d4dcec;
       --code-btn-bg: rgba(20, 30, 45, 0.6);
       --code-btn-color: #b0c4de;
       --code-btn-hover-bg: #4f9cf7;
       --code-btn-hover-color: #ffffff;
+      /* 文章内容框 */
+      --content-bg: rgba(0, 0, 0, 0.2);
+      --content-border: var(--border);
     }
 
     :root[data-theme="light"] {
@@ -80,13 +82,14 @@
       --gold-soft: #fef3c7;
       --link-color: #2b6cb0;
       --link-hover: #2c5282;
-      /* 亮色模式专用：更清爽的标签与按钮 */
       --code-label-bg: rgba(255, 255, 255, 0.85);
       --code-label-color: #1a202c;
       --code-btn-bg: rgba(255, 255, 255, 0.85);
       --code-btn-color: #2d3748;
       --code-btn-hover-bg: #3182ce;
       --code-btn-hover-color: #ffffff;
+      --content-bg: rgba(255, 255, 255, 0.4);
+      --content-border: #e2e8f0;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -395,7 +398,7 @@
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* 代码块 —— 悬浮淡入淡出，亮色模式优化 */
+    /* 代码块 —— 悬浮淡入淡出 */
     .code-block-wrapper {
       position: relative;
       margin: 1.2rem 0;
@@ -441,23 +444,27 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* 复制按钮 —— 放大尺寸 */
     .copy-code-btn {
       position: absolute;
-      top: 0.5rem;
+      top: 0.4rem;
       right: 0.7rem;
       background: var(--code-btn-bg);
       backdrop-filter: blur(6px);
       color: var(--code-btn-color);
       border: 1px solid rgba(128, 128, 128, 0.15);
       border-radius: 20px;
-      padding: 0.15rem 0.8rem;
-      font-size: 0.65rem;
+      padding: 0.25rem 1rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 6;
       opacity: 0;
       transform: translateY(-6px);
+      letter-spacing: 0.3px;
+      min-width: 52px;
+      text-align: center;
     }
     .code-block-wrapper:hover .copy-code-btn {
       opacity: 1;
@@ -467,7 +474,7 @@
       background: var(--code-btn-hover-bg);
       color: var(--code-btn-hover-color);
       border-color: var(--code-btn-hover-bg);
-      transform: translateY(-2px) scale(1.05);
+      transform: translateY(-2px) scale(1.06);
     }
     /* 美化超链接 */
     .markdown-body a {
@@ -756,7 +763,6 @@
     .author-name { font-weight: 700; font-size: 1.2rem; color: var(--text); }
     .author-desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    /* 更新日志——去掉内部动效，只保留展开/收起过渡 */
     .changelog {
       max-height: 300px;
       overflow-y: auto;
@@ -766,7 +772,6 @@
     .changelog-item {
       padding: 0.8rem 0;
       border-bottom: 1px dashed var(--border);
-      /* 移除 hover 背景和位移，保持干净 */
     }
     .changelog-item:last-child { border-bottom: none; }
     .changelog-version { font-weight: 600; color: var(--accent); font-size: 0.9rem; margin-bottom: 0.3rem; }
@@ -835,6 +840,20 @@
     #sidebarTOC .toc-item:hover { color: var(--accent); background: var(--accent-soft); transform: translateX(4px); }
     #sidebarTOC .toc-item.active { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
 
+    /* ===== 文章内容独立框 ===== */
+    .post-content-wrapper {
+      background: var(--content-bg);
+      border: 1px solid var(--content-border);
+      border-radius: var(--radius);
+      padding: 1.8rem 2rem;
+      margin: 0.5rem 0 1.5rem;
+      transition: background 0.3s ease, border-color 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+    .post-content-wrapper .markdown-body {
+      animation: contentFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
     @media (max-width: 900px) {
       .main-grid { grid-template-columns: 1fr; }
       .site-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
@@ -846,9 +865,10 @@
       .search-box input { width: 80px; }
       .search-box input:focus { width: 120px; }
       .profile-info { flex-direction: column; align-items: center; text-align: center; }
-      .copy-code-btn { opacity: 0.8; }
+      .copy-code-btn { opacity: 0.8; font-size: 0.7rem; padding: 0.2rem 0.7rem; }
       .code-language-label { opacity: 0.9; transform: translateY(0); }
       .back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 1.2rem; }
+      .post-content-wrapper { padding: 1rem; }
     }
   </style>
 </head>
@@ -888,7 +908,7 @@
 
     <div class="main-grid">
       <main class="post-list" id="postList">
-        <div class="loading">加载中...</div>
+        <div class="loading">少女祈祷中...</div>
       </main>
       <aside class="sidebar">
         <div class="sidebar-card">
@@ -902,14 +922,13 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
-              <div class="changelog-version">v1.5.0</div>
+              <div class="changelog-version">v1.6.0</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
-                ✨ 亮色模式代码标签与按钮风格优化<br>
-                🎬 文章内容加载淡入动效<br>
-                📝 复制按钮文字改为 "Copy"<br>
-                🧹 更新日志去除内部动效<br>
-                🔗 超链接下划线动效
+                📦 文章内容添加独立框<br>
+                🔍 放大 Copy 按钮尺寸<br>
+                🙏 加载文案改为「少女祈祷中」<br>
+                ✨ 亮色模式代码标签优化
               </div>
             </div>
           </div>
@@ -1319,7 +1338,7 @@
     async function loadPosts() {
       var listEl = document.getElementById('postList');
       hideTOC();
-      listEl.innerHTML = '<div class="loading">加载中...</div>';
+      listEl.innerHTML = '<div class="loading">少女祈祷中...</div>';
       try {
         var issues = await proxyRequest('GET', '/api/issues?state=open&labels=' + LABEL_PREFIX + '&per_page=100');
         allPosts = issues.filter(function(issue) { return issue.labels.some(function(label) { return label.name === LABEL_PREFIX; }); });
@@ -1408,7 +1427,7 @@
     async function showPost(issueNumber) {
       var listEl = document.getElementById('postList');
       localStorage.setItem('current_issue_number', issueNumber);
-      listEl.innerHTML = '<div class="loading">加载文章...</div>';
+      listEl.innerHTML = '<div class="loading">少女祈祷中...</div>';
       try {
         var issue = await proxyRequest('GET', '/api/issues/' + issueNumber);
         var rawContent = issue.body || '';
@@ -1425,7 +1444,7 @@
         var comments = await loadComments(issueNumber);
         var userLoggedIn = isUserLoggedIn();
         
-        // 使用 post-detail 类触发淡入动效
+        // 使用独立的内容框包裹文章主体
         listEl.innerHTML = '<div class="post-detail">' +
           '<button class="btn btn-secondary" id="backBtn">← 返回列表</button>' +
           '<h1>' + escapeHtml(issue.title) + '</h1>' +
@@ -1436,7 +1455,9 @@
           '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
+          '<div class="post-content-wrapper">' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
+          '</div>' +
           adminButtons +
           '<div class="comments-section">' +
           '<div class="comments-title">💬 评论 (' + comments.length + ')</div>' +
