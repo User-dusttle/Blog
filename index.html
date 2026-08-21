@@ -227,6 +227,16 @@
       color: #ffffff;
       font-weight: 700;
     }
+    .stat-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      background: var(--accent-soft);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
     .post-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; transition: color 0.3s ease; }
     .post-card:hover .post-title { color: var(--accent); }
     .post-excerpt { color: var(--text-secondary); font-size: 0.95rem; }
@@ -272,7 +282,6 @@
 
     .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
-    /* 浮动 TOC */
     #sidebarTOC {
       position: fixed;
       right: 1rem;
@@ -311,15 +320,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    #sidebarTOC .toc-item:hover {
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-    #sidebarTOC .toc-item.active {
-      color: var(--accent);
-      font-weight: 600;
-      background: var(--accent-soft);
-    }
+    #sidebarTOC .toc-item:hover { color: var(--accent); background: var(--accent-soft); }
+    #sidebarTOC .toc-item.active { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
 
     .post-detail {
       background: var(--surface);
@@ -618,27 +620,19 @@
           <h3 id="changelogToggle"><span class="arrow">▼</span> 📋 更新日志</h3>
           <div class="changelog" id="changelogContent">
             <div class="changelog-item">
+              <div class="changelog-version">v1.0.4</div>
+              <div class="changelog-date">2026-08-21</div>
+              <div class="changelog-desc">
+                ✨ 新增文章统计<br>
+                📊 字数/阅读时间/浏览量
+              </div>
+            </div>
+            <div class="changelog-item">
               <div class="changelog-version">v1.0.3</div>
               <div class="changelog-date">2026-08-21</div>
               <div class="changelog-desc">
                 ✨ 浮动TOC目录<br>
-                📄 分页功能<br>
-                📋 代码复制按钮
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.0.2</div>
-              <div class="changelog-date">2026-08-21</div>
-              <div class="changelog-desc">
-                ✨ 暗色/浅色模式
-              </div>
-            </div>
-            <div class="changelog-item">
-              <div class="changelog-version">v1.0.1</div>
-              <div class="changelog-date">2026-08-21</div>
-              <div class="changelog-desc">
-                ✨ 权重排序<br>
-                ⚖️ 标签筛选
+                📄 分页功能
               </div>
             </div>
             <div class="changelog-item">
@@ -660,7 +654,6 @@
     </div>
   </div>
 
-  <!-- 浮动 TOC -->
   <div id="sidebarTOC"></div>
 
   <div class="password-modal" id="passwordModal">
@@ -679,6 +672,7 @@
     const ADMIN_PASSWORD = 'l20130213';
     const LABEL_PREFIX = 'blog-post';
     const PROFILE_LABEL = 'profile-data';
+    const VIEW_LABEL = 'view-count';
     
     let isAdmin = false;
     let allPosts = [];
@@ -858,6 +852,43 @@
       return 2;
     }
 
+    // ==================== 文章统计 ====================
+    function countWords(text) {
+      if (!text) return 0;
+      var cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/[#>*`\-\n\r\t]/g, '');
+      var chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+      var englishWords = (cleanText.match(/[a-zA-Z0-9]+/g) || []).length;
+      return chineseChars + englishWords;
+    }
+
+    function estimateReadTime(wordCount) {
+      var minutes = Math.ceil(wordCount / 300);
+      if (minutes < 1) return '不到 1 分钟';
+      return minutes + ' 分钟';
+    }
+
+    // 浏览量存储（localStorage 模拟数据库，同一 IP 不重复计数）
+    function getViewCount(issueNumber) {
+      var views = JSON.parse(localStorage.getItem('blog_views') || '{}');
+      return views[issueNumber] || 0;
+    }
+
+    function incrementViewCount(issueNumber) {
+      var views = JSON.parse(localStorage.getItem('blog_views') || '{}');
+      var viewedPosts = JSON.parse(localStorage.getItem('blog_viewed_posts') || '{}');
+      
+      // 同一 IP（浏览器）不重复计数
+      if (viewedPosts[issueNumber]) {
+        return views[issueNumber] || 0;
+      }
+      
+      views[issueNumber] = (views[issueNumber] || 0) + 1;
+      viewedPosts[issueNumber] = true;
+      localStorage.setItem('blog_views', JSON.stringify(views));
+      localStorage.setItem('blog_viewed_posts', JSON.stringify(viewedPosts));
+      return views[issueNumber];
+    }
+
     function updateSidebarProfile() {
       var avatarEl = document.getElementById('sidebarAvatar');
       var nameEl = document.getElementById('sidebarName');
@@ -1032,6 +1063,9 @@
       
       listEl.innerHTML = pagePosts.map(function(issue) {
         var weight = getWeightFromLabels(issue.labels);
+        var wordCount = countWords(issue.body || '');
+        var readTime = estimateReadTime(wordCount);
+        var views = getViewCount(issue.number);
         var preview = issue.body ? issue.body.replace(/```[\s\S]*?```/g, '[代码]').replace(/[#>*`\n]/g, ' ').slice(0, 150) + '...' : '';
         var tags = issue.labels
           .filter(function(l) { return l.name !== LABEL_PREFIX && !l.name.startsWith('weight:'); })
@@ -1042,6 +1076,9 @@
           '<div class="post-meta">' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
           weightBadge +
+          '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
+          '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
+          '<span class="stat-badge">👁️ ' + views + ' 次浏览</span>' +
           '</div>' +
           '<h2 class="post-title">' + escapeHtml(issue.title) + '</h2>' +
           '<p class="post-excerpt">' + escapeHtml(preview) + '</p>' +
@@ -1130,6 +1167,12 @@
         var content = renderMarkdown(rawContent);
         var headings = generateTOC(content);
         renderFloatingTOC(headings);
+        
+        // 文章统计
+        var wordCount = countWords(rawContent);
+        var readTime = estimateReadTime(wordCount);
+        var views = incrementViewCount(issueNumber);
+        
         var weight = getWeightFromLabels(issue.labels);
         var weightDisplay = isAdmin ? '<span class="weight-badge">⚖️ 权重: ' + weight + '</span>' : '';
         var tags = issue.labels
@@ -1146,6 +1189,9 @@
           '<div class="post-meta" style="margin-bottom:1rem;">' +
           '<span class="post-date">📅 ' + new Date(issue.created_at).toLocaleDateString('zh-CN') + '</span>' +
           weightDisplay +
+          '<span class="stat-badge">📝 ' + wordCount + ' 字</span>' +
+          '<span class="stat-badge">⏱️ ' + readTime + '</span>' +
+          '<span class="stat-badge">👁️ ' + views + ' 次浏览</span>' +
           (tags ? '<span>' + tags + '</span>' : '') +
           '</div>' +
           '<div class="markdown-body" id="markdownContent">' + content + '</div>' +
